@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --mkn-navy: #1B3A6B;
+    --mkn-blue: #2B6CB0;
+    --mkn-orange: #D94F2B;
+    --mkn-coral: #E86547;
+    --mkn-surface: #FFFFFF;
+    --mkn-surface-alt: #F7F8FA;
+    --mkn-border: #E2E8F0;
+    --mkn-text: #1A202C;
+    --mkn-text-secondary: #718096;
+  }
+
+  html, body, #root {
+    background-color: #F7F8FA;
+    font-family: 'Kanit', sans-serif;
+    color: #1A202C;
+    overflow-x: clip;
+  }
+  
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
+}
+
+.hero-navy-heading {
+  background: linear-gradient(135deg, #1B3A6B 0%, #2B6CB0 60%, #D94F2B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.mkn-glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 20px -2px rgba(27, 58, 107, 0.06);
+}
+
+.mkn-navy-card {
+  background: linear-gradient(145deg, #1B3A6B 0%, #12284C 100%);
+  color: #FFFFFF;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F8FA;
+}
+::-webkit-scrollbar-thumb {
+  background: #2B6CB0;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D94F2B;
+}
+
+/* Mouse grab dragging cursor utilities */
+.cursor-grab {
+  cursor: grab;
+}
+.cursor-grabbing {
+  cursor: grabbing;
+}
+
+/* Dynamic MKN Logo Motion Animations */
+@keyframes ribbonFlow {
+  0% {
+    stroke-dashoffset: 600;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ribbonGradientShift {
+  0% {
+    stop-color: #FF5500;
+  }
+  33% {
+    stop-color: #00A3E0;
+  }
+  66% {
+    stop-color: #D94F2B;
+  }
+  100% {
+    stop-color: #FF5500;
+  }
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+}
+
+@keyframes logoPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 85, 0, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(0, 163, 224, 0.7));
+  }
+}
+
+.animate-ribbon-flow {
+  stroke-dasharray: 600;
+  animation: ribbonFlow 6s linear infinite;
+}
+
+.animate-logo-float {
+  animation: logoFloat 4s ease-in-out infinite;
+}
+
+.animate-logo-pulse {
+  animation: logoPulseGlow 3s ease-in-out infinite;
+}
+

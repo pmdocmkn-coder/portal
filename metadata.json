@@ -1,0 +1,6 @@
+{
+  "name": "MKN — Interactive Company Web Portal & Motion Showcase",
+  "description": "Pusat akses dan direktori resmi web portal perusahaan Synergy MKN Onwards, menghubungkan seluruh sistem operasional, analitik, dan layanan digital terpadu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

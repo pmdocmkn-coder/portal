@@ -1,0 +1,339 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { MARQUEE_ROW_1, MARQUEE_ROW_2, MarqueeItem } from '../data/portalData';
+import { PortalSite } from '../types';
+import { Sparkles, Eye, MoveHorizontal, MousePointerClick, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+
+interface MarqueeSectionProps {
+  onSelectSite: (site: PortalSite) => void;
+}
+
+export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) => {
+  const containerRef1 = useRef<HTMLDivElement>(null);
+  const containerRef2 = useRef<HTMLDivElement>(null);
+
+  // Drag state for Row 1
+  const [isDragging1, setIsDragging1] = useState(false);
+  const [startX1, setStartX1] = useState(0);
+  const [scrollLeft1, setScrollLeft1] = useState(0);
+
+  // Drag state for Row 2
+  const [isDragging2, setIsDragging2] = useState(false);
+  const [startX2, setStartX2] = useState(0);
+  const [scrollLeft2, setScrollLeft2] = useState(0);
+
+  // Auto-scroll animation ref
+  const animFrameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    // Initial scroll setup for row 2 to start centered
+    if (containerRef2.current) {
+      containerRef2.current.scrollLeft = 400;
+    }
+  }, []);
+
+  // Continuous gentle marquee loop when not dragging
+  useEffect(() => {
+    let lastTime = performance.now();
+
+    const animate = (now: number) => {
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      if (containerRef1.current && !isDragging1) {
+        containerRef1.current.scrollLeft += 40 * delta; // move right
+        if (
+          containerRef1.current.scrollLeft >=
+          containerRef1.current.scrollWidth - containerRef1.current.clientWidth - 10
+        ) {
+          containerRef1.current.scrollLeft = 0;
+        }
+      }
+
+      if (containerRef2.current && !isDragging2) {
+        containerRef2.current.scrollLeft -= 35 * delta; // move left
+        if (containerRef2.current.scrollLeft <= 5) {
+          containerRef2.current.scrollLeft = containerRef2.current.scrollWidth / 2;
+        }
+      }
+
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [isDragging1, isDragging2]);
+
+  // Mouse & Touch Drag Handlers for Row 1
+  const handleMouseDown1 = (e: React.MouseEvent) => {
+    if (!containerRef1.current) return;
+    setIsDragging1(true);
+    setStartX1(e.pageX - containerRef1.current.offsetLeft);
+    setScrollLeft1(containerRef1.current.scrollLeft);
+  };
+
+  const handleMouseLeave1 = () => setIsDragging1(false);
+  const handleMouseUp1 = () => setIsDragging1(false);
+
+  const handleMouseMove1 = (e: React.MouseEvent) => {
+    if (!isDragging1 || !containerRef1.current) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef1.current.offsetLeft;
+    const walk = (x - startX1) * 2; // drag speed multiplier
+    containerRef1.current.scrollLeft = scrollLeft1 - walk;
+  };
+
+  // Mouse & Touch Drag Handlers for Row 2
+  const handleMouseDown2 = (e: React.MouseEvent) => {
+    if (!containerRef2.current) return;
+    setIsDragging2(true);
+    setStartX2(e.pageX - containerRef2.current.offsetLeft);
+    setScrollLeft2(containerRef2.current.scrollLeft);
+  };
+
+  const handleMouseLeave2 = () => setIsDragging2(false);
+  const handleMouseUp2 = () => setIsDragging2(false);
+
+  const handleMouseMove2 = (e: React.MouseEvent) => {
+    if (!isDragging2 || !containerRef2.current) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef2.current.offsetLeft;
+    const walk = (x - startX2) * 2;
+    containerRef2.current.scrollLeft = scrollLeft2 - walk;
+  };
+
+  // Manual Nudge Buttons
+  const nudgeRow1 = (direction: 'left' | 'right') => {
+    if (containerRef1.current) {
+      containerRef1.current.scrollBy({
+        left: direction === 'left' ? -400 : 400,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const nudgeRow2 = (direction: 'left' | 'right') => {
+    if (containerRef2.current) {
+      containerRef2.current.scrollBy({
+        left: direction === 'left' ? -400 : 400,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Duplicate items for seamless continuous looping
+  const row1Items = [...MARQUEE_ROW_1, ...MARQUEE_ROW_1, ...MARQUEE_ROW_1];
+  const row2Items = [...MARQUEE_ROW_2, ...MARQUEE_ROW_2, ...MARQUEE_ROW_2];
+
+  return (
+    <section className="relative bg-[#F7F8FA] border-y border-[#E2E8F0] py-16 overflow-hidden select-none">
+      {/* Header Info & Drag Instruction Banner */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#D94F2B] animate-ping" />
+            <span className="text-xs font-bold uppercase tracking-widest text-[#1B3A6B]">
+              MKN Live Company Portal Showcase
+            </span>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A202C]">
+            Interactive Showcase Captures
+          </h2>
+        </div>
+
+        {/* Mouse Drag Banner Callout */}
+        <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-full border border-[#E2E8F0] shadow-sm">
+          <div className="w-8 h-8 rounded-full bg-[#1B3A6B] text-white flex items-center justify-center animate-pulse">
+            <MoveHorizontal className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-[#1B3A6B] flex items-center gap-1">
+              Geser pake mouse/cursor
+              <MousePointerClick className="w-3.5 h-3.5 text-[#D94F2B]" />
+            </p>
+            <p className="text-[11px] text-[#718096]">Klik & tahan cursor untuk menggeser galeri</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 1 - Draggable Marquee */}
+      <div className="relative group mb-6">
+        {/* Navigation Arrows on Hover */}
+        <button
+          onClick={() => nudgeRow1('left')}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          title="Geser Kiri"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={() => nudgeRow1('right')}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          title="Geser Kanan"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        <div
+          ref={containerRef1}
+          onMouseDown={handleMouseDown1}
+          onMouseLeave={handleMouseLeave1}
+          onMouseUp={handleMouseUp1}
+          onMouseMove={handleMouseMove1}
+          className={`flex gap-4 overflow-x-auto scrollbar-none px-6 no-scrollbar ${
+            isDragging1 ? 'cursor-grabbing scroll-auto' : 'cursor-grab'
+          }`}
+          style={{ scrollBehavior: isDragging1 ? 'auto' : 'smooth' }}
+        >
+          {row1Items.map((item, idx) => (
+            <div
+              key={`row1-${item.id}-${idx}`}
+              onClick={(e) => {
+                if (!isDragging1) {
+                  onSelectSite(item as unknown as PortalSite);
+                }
+              }}
+              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[440px] h-[190px] sm:h-[240px] md:h-[270px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1"
+            >
+              <img
+                src={item.gif}
+                alt={item.title}
+                loading="lazy"
+                draggable={false}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
+              />
+
+              {/* Status & Company Badge */}
+              <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/85 text-white backdrop-blur-md border border-white/20">
+                  {item.company}
+                </span>
+                <span
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold text-white backdrop-blur-md ${
+                    item.statusColor === 'emerald'
+                      ? 'bg-[#059669]'
+                      : item.statusColor === 'amber'
+                      ? 'bg-[#F59E0B]'
+                      : 'bg-[#D94F2B]'
+                  }`}
+                >
+                  {item.status}
+                </span>
+              </div>
+
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A6B]/95 via-[#1B3A6B]/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                <div className="flex items-end justify-between text-white">
+                  <div>
+                    <span className="text-[11px] uppercase tracking-wider font-semibold text-[#E86547]">
+                      {item.category}
+                    </span>
+                    <h4 className="font-bold text-base sm:text-lg text-white leading-tight mt-0.5">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-[#E2E8F0] line-clamp-2 mt-1">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-[#D94F2B] text-white flex items-center justify-center shadow-md flex-shrink-0 ml-3">
+                    <Eye className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Row 2 - Draggable Marquee Opposite Direction */}
+      <div className="relative group">
+        <button
+          onClick={() => nudgeRow2('left')}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          title="Geser Kiri"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={() => nudgeRow2('right')}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          title="Geser Kanan"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        <div
+          ref={containerRef2}
+          onMouseDown={handleMouseDown2}
+          onMouseLeave={handleMouseLeave2}
+          onMouseUp={handleMouseUp2}
+          onMouseMove={handleMouseMove2}
+          className={`flex gap-4 overflow-x-auto scrollbar-none px-6 no-scrollbar ${
+            isDragging2 ? 'cursor-grabbing scroll-auto' : 'cursor-grab'
+          }`}
+          style={{ scrollBehavior: isDragging2 ? 'auto' : 'smooth' }}
+        >
+          {row2Items.map((item, idx) => (
+            <div
+              key={`row2-${item.id}-${idx}`}
+              onClick={(e) => {
+                if (!isDragging2) {
+                  onSelectSite(item as unknown as PortalSite);
+                }
+              }}
+              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[440px] h-[190px] sm:h-[240px] md:h-[270px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1"
+            >
+              <img
+                src={item.gif}
+                alt={item.title}
+                loading="lazy"
+                draggable={false}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
+              />
+
+              {/* Status & Company Badge */}
+              <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/85 text-white backdrop-blur-md border border-white/20">
+                  {item.company}
+                </span>
+                <span
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold text-white backdrop-blur-md ${
+                    item.statusColor === 'emerald'
+                      ? 'bg-[#059669]'
+                      : item.statusColor === 'amber'
+                      ? 'bg-[#F59E0B]'
+                      : 'bg-[#D94F2B]'
+                  }`}
+                >
+                  {item.status}
+                </span>
+              </div>
+
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A6B]/95 via-[#1B3A6B]/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                <div className="flex items-end justify-between text-white">
+                  <div>
+                    <span className="text-[11px] uppercase tracking-wider font-semibold text-[#E86547]">
+                      {item.category}
+                    </span>
+                    <h4 className="font-bold text-base sm:text-lg text-white leading-tight mt-0.5">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-[#E2E8F0] line-clamp-2 mt-1">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-[#D94F2B] text-white flex items-center justify-center shadow-md flex-shrink-0 ml-3">
+                    <Eye className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
