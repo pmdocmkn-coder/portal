@@ -123,3 +123,31 @@
   animation: logoPulseGlow 3s ease-in-out infinite;
 }
 
+@keyframes logoMknFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) scale(1.02) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.05) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-6px) scale(1.02) rotate(-1deg);
+  }
+}
+
+@keyframes logoMknGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(27, 58, 107, 0.4)) drop-shadow(0 0 20px rgba(217, 79, 43, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(27, 58, 107, 0.6)) drop-shadow(0 0 40px rgba(217, 79, 43, 0.4));
+  }
+}
+
+.animate-logo-mkn {
+  animation: logoMknFloat 5s ease-in-out infinite, logoMknGlow 3s ease-in-out infinite;
+}
+

@@ -1,5 +1,7 @@
 import { PortalSite, ProjectCardData, ServiceItem } from '../types';
 import erpppImg from '../assets/images/erppp.jpg';
+import logoMkn from '../assets/images/logo_mkn.png';
+import gifOnward from '../assets/images/gif onward.gif';
 
 export interface CompanyInfo {
   name: string;
@@ -184,6 +186,7 @@ export const DECORATIVE_IMAGES = {
   moonIcon: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png',
   object3D: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/p59_1.4659672e.png',
   legoIcon: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png',
-  group3D: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/Group_134-1.2e04f3ce.png',
-  heroPortrait: 'https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png'
+  group3D: logoMkn,
+  heroPortrait: 'https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png',
+  gifOnward: gifOnward
 };

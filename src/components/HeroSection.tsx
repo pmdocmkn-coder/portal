@@ -145,24 +145,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
                     <div className="absolute inset-0 bg-gradient-to-tr from-[#1B3A6B] to-[#D94F2B] rounded-3xl blur-xl opacity-15 transform scale-95" />
 
                     {/* Main Card Graphic */}
-                    <div className="relative bg-white/95 backdrop-blur-xl border border-[#E2E8F0] p-5 rounded-3xl shadow-xl">
+                    <div className="relative bg-white/95 backdrop-blur-xl border border-[#E2E8F0] p-5 rounded-3xl shadow-xl overflow-hidden">
                       <img
-                        src={DECORATIVE_IMAGES.group3D}
-                        alt="MKN Interactive Portal 3D Graphic"
-                        className="w-full h-auto max-h-[280px] object-contain rounded-2xl drop-shadow-md"
+                        src={DECORATIVE_IMAGES.gifOnward}
+                        alt="MKN Onwards Animation"
+                        className="w-full h-auto max-h-[280px] object-contain rounded-2xl"
                       />
 
-                      <div className="mt-4 p-3.5 rounded-2xl bg-[#F7F8FA] border border-[#E2E8F0]">
+                      <div className="mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-[#1B3A6B] to-[#D94F2B] border border-[#E2E8F0]">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-[11px] font-extrabold text-[#1B3A6B] uppercase tracking-wider">
-                            MKN DIGITAL STUDIO ECOSYSTEM
+                          <span className="text-[11px] font-extrabold text-white uppercase tracking-wider">
+                            MKN ONWARDS
                           </span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#059669] text-white">
-                            LIVE STATUS
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/20 text-white backdrop-blur-sm">
+                            MOTION
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#718096] leading-relaxed font-medium">
-                          Inovasi web portal perusahaan terpusat untuk pengalaman merek digital interaktif masa kini.
+                        <p className="text-[11px] text-white/90 leading-relaxed font-medium">
+                          Transformasi Digital menuju era baru kemitraan dan inovasi berkelanjutan.
                         </p>
                       </div>
                     </div>

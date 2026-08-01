@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import logoMkn from '../../assets/images/logo_mkn.png';
 
 interface MKNLogoProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   showSubtext?: boolean;
   mediaUrl?: string;
-  mediaType?: 'svg' | 'gif' | 'video';
+  mediaType?: 'svg' | 'gif' | 'video' | 'image';
   interactive?: boolean;
   onClick?: () => void;
 }
@@ -20,7 +21,7 @@ export const MKNLogo: React.FC<MKNLogoProps> = ({
   onClick
 }) => {
   const [hasMediaError, setHasMediaError] = useState(false);
-  const activeMediaUrl = mediaUrl || '/mkn-logo.mp4';
+  const activeMediaUrl = mediaUrl || logoMkn;
   
   const heightMap = {
     sm: 'h-8',
@@ -28,9 +29,10 @@ export const MKNLogo: React.FC<MKNLogoProps> = ({
     lg: 'h-14 sm:h-16'
   };
 
-  const detectedType = mediaType || (activeMediaUrl.endsWith('.mp4') || activeMediaUrl.endsWith('.webm') ? 'video' : 'gif');
+  const detectedType = mediaType || 'image';
   const showVideo = !hasMediaError && detectedType === 'video';
-  const showGif = !hasMediaError && detectedType === 'gif' && activeMediaUrl !== '/mkn-logo.mp4';
+  const showGif = !hasMediaError && detectedType === 'gif';
+  const showImage = !hasMediaError && (detectedType === 'image' || (!showVideo && !showGif));
 
   return (
     <div
@@ -53,6 +55,13 @@ export const MKNLogo: React.FC<MKNLogoProps> = ({
           <img
             src={activeMediaUrl}
             alt="Synergy MKN Onwards Motion Logo"
+            onError={() => setHasMediaError(true)}
+            className="h-full w-auto object-contain rounded-lg drop-shadow-md transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : showImage ? (
+          <img
+            src={activeMediaUrl}
+            alt="MKN Logo"
             onError={() => setHasMediaError(true)}
             className="h-full w-auto object-contain rounded-lg drop-shadow-md transition-transform duration-300 group-hover:scale-105"
           />
