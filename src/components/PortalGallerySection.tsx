@@ -11,11 +11,7 @@ interface PortalGallerySectionProps {
 const CATEGORIES = [
   'Semua Portal',
   'Operasional & Sistem',
-  'Manajemen & Analitik',
-  'Layanan Karyawan & HR',
-  'Pengembang & Infrastruktur',
-  'Informasi & Publikasi',
-  'Portal Keamanan & Akses'
+  'Manajemen & Analitik'
 ];
 
 export const PortalGallerySection: React.FC<PortalGallerySectionProps> = ({ onSelectSite }) => {
@@ -110,12 +106,21 @@ export const PortalGallerySection: React.FC<PortalGallerySectionProps> = ({ onSe
                 {/* Image Media Preview */}
                 <div className="relative aspect-video w-full bg-[#F7F8FA] overflow-hidden border-b border-[#E2E8F0]">
                   <img
-                    src={site.gif}
+                    src={site.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${site.url}`}
                     alt={site.title}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = site.gif;
+                    }}
                   />
                   
+                  {/* Live Tag */}
+                  <span className="absolute bottom-3 left-3 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[9px] font-bold text-white flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#059669] animate-pulse" />
+                    Live Web
+                  </span>
+
                   {/* Company Badge */}
                   <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#1B3A6B]/90 backdrop-blur-md text-[10px] font-bold text-white border border-white/20">
                     {site.company}

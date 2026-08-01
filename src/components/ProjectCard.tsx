@@ -111,12 +111,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </div>
           </div>
 
-          <div className="md:col-span-7 h-full rounded-2xl overflow-hidden bg-[#F7F8FA] border border-[#E2E8F0] shadow-sm">
+          <div className="md:col-span-7 h-full rounded-2xl overflow-hidden bg-[#F7F8FA] border border-[#E2E8F0] shadow-sm relative group">
             <img
-              src={project.col2Image}
+              src={project.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${project.liveUrl}`}
               alt={`${project.title} Main Showcase`}
               className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = project.col2Image;
+              }}
             />
+            <div className="absolute top-3 right-3 bg-black/75 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
+              <span>Live Snapshot</span>
+            </div>
           </div>
         </div>
       </motion.div>

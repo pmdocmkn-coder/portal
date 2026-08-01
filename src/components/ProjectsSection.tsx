@@ -28,7 +28,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = () => {
           </FadeIn>
           <FadeIn y={20} delay={0.2} duration={0.6}>
             <p className="text-sm text-[#718096] mt-3">
-              Pratinjau langsung 3 portal utama yang paling sering diakses oleh tim eksekutif dan operasional perusahaan.
+              Pratinjau langsung 4 portal utama yang paling sering diakses oleh tim eksekutif dan operasional perusahaan.
             </p>
           </FadeIn>
         </div>

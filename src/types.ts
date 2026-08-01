@@ -9,6 +9,7 @@ export interface PortalSite {
   tags: string[];
   clientOrType: 'Client' | 'Personal' | 'Curated';
   year: string;
+  customImage?: string;
 }
 
 export interface ProjectCardData {
@@ -23,6 +24,7 @@ export interface ProjectCardData {
   liveUrl: string;
   description?: string;
   techStack?: string[];
+  customImage?: string;
 }
 
 export interface ServiceItem {

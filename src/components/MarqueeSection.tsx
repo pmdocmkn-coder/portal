@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MARQUEE_ROW_1, MARQUEE_ROW_2, MarqueeItem } from '../data/portalData';
 import { PortalSite } from '../types';
-import { Sparkles, Eye, MoveHorizontal, MousePointerClick, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, MoveHorizontal, MousePointerClick, ChevronLeft, ChevronRight, Globe } from 'lucide-react';
 
 interface MarqueeSectionProps {
   onSelectSite: (site: PortalSite) => void;
@@ -27,7 +27,7 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
   useEffect(() => {
     // Initial scroll setup for row 2 to start centered
     if (containerRef2.current) {
-      containerRef2.current.scrollLeft = 400;
+      containerRef2.current.scrollLeft = containerRef2.current.scrollWidth / 4;
     }
   }, []);
 
@@ -37,22 +37,25 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
 
     const animate = (now: number) => {
       const delta = (now - lastTime) / 1000;
-      lastTime = now;
+      lastTime = Math.min(now, lastTime + 100); // cap max delta to avoid huge jumps on tab switch
 
+      // Row 1 continuous scroll right
       if (containerRef1.current && !isDragging1) {
-        containerRef1.current.scrollLeft += 40 * delta; // move right
-        if (
-          containerRef1.current.scrollLeft >=
-          containerRef1.current.scrollWidth - containerRef1.current.clientWidth - 10
-        ) {
-          containerRef1.current.scrollLeft = 0;
+        const el = containerRef1.current;
+        el.scrollLeft += 45 * delta;
+        const halfWidth = el.scrollWidth / 2;
+        if (el.scrollLeft >= halfWidth) {
+          el.scrollLeft -= halfWidth;
         }
       }
 
+      // Row 2 continuous scroll left
       if (containerRef2.current && !isDragging2) {
-        containerRef2.current.scrollLeft -= 35 * delta; // move left
-        if (containerRef2.current.scrollLeft <= 5) {
-          containerRef2.current.scrollLeft = containerRef2.current.scrollWidth / 2;
+        const el = containerRef2.current;
+        el.scrollLeft -= 45 * delta;
+        const halfWidth = el.scrollWidth / 2;
+        if (el.scrollLeft <= 5) {
+          el.scrollLeft += halfWidth;
         }
       }
 
@@ -81,7 +84,7 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
     if (!isDragging1 || !containerRef1.current) return;
     e.preventDefault();
     const x = e.pageX - containerRef1.current.offsetLeft;
-    const walk = (x - startX1) * 2; // drag speed multiplier
+    const walk = (x - startX1) * 1.8;
     containerRef1.current.scrollLeft = scrollLeft1 - walk;
   };
 
@@ -100,7 +103,7 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
     if (!isDragging2 || !containerRef2.current) return;
     e.preventDefault();
     const x = e.pageX - containerRef2.current.offsetLeft;
-    const walk = (x - startX2) * 2;
+    const walk = (x - startX2) * 1.8;
     containerRef2.current.scrollLeft = scrollLeft2 - walk;
   };
 
@@ -108,7 +111,7 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
   const nudgeRow1 = (direction: 'left' | 'right') => {
     if (containerRef1.current) {
       containerRef1.current.scrollBy({
-        left: direction === 'left' ? -400 : 400,
+        left: direction === 'left' ? -380 : 380,
         behavior: 'smooth'
       });
     }
@@ -117,15 +120,15 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
   const nudgeRow2 = (direction: 'left' | 'right') => {
     if (containerRef2.current) {
       containerRef2.current.scrollBy({
-        left: direction === 'left' ? -400 : 400,
+        left: direction === 'left' ? -380 : 380,
         behavior: 'smooth'
       });
     }
   };
 
-  // Duplicate items for seamless continuous looping
-  const row1Items = [...MARQUEE_ROW_1, ...MARQUEE_ROW_1, ...MARQUEE_ROW_1];
-  const row2Items = [...MARQUEE_ROW_2, ...MARQUEE_ROW_2, ...MARQUEE_ROW_2];
+  // Duplicate items 4 times for seamless infinite continuous looping
+  const row1Items = [...MARQUEE_ROW_1, ...MARQUEE_ROW_1, ...MARQUEE_ROW_1, ...MARQUEE_ROW_1];
+  const row2Items = [...MARQUEE_ROW_2, ...MARQUEE_ROW_2, ...MARQUEE_ROW_2, ...MARQUEE_ROW_2];
 
   return (
     <section className="relative bg-[#F7F8FA] border-y border-[#E2E8F0] py-16 overflow-hidden select-none">
@@ -163,14 +166,14 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
         {/* Navigation Arrows on Hover */}
         <button
           onClick={() => nudgeRow1('left')}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
           title="Geser Kiri"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
         <button
           onClick={() => nudgeRow1('right')}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
           title="Geser Kanan"
         >
           <ChevronRight className="w-6 h-6" />
@@ -182,44 +185,40 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
           onMouseLeave={handleMouseLeave1}
           onMouseUp={handleMouseUp1}
           onMouseMove={handleMouseMove1}
-          className={`flex gap-4 overflow-x-auto scrollbar-none px-6 no-scrollbar ${
-            isDragging1 ? 'cursor-grabbing scroll-auto' : 'cursor-grab'
+          className={`flex gap-4 overflow-x-auto px-6 no-scrollbar ${
+            isDragging1 ? 'cursor-grabbing' : 'cursor-grab'
           }`}
-          style={{ scrollBehavior: isDragging1 ? 'auto' : 'smooth' }}
+          style={{ scrollBehavior: 'auto' }}
         >
           {row1Items.map((item, idx) => (
             <div
               key={`row1-${item.id}-${idx}`}
-              onClick={(e) => {
+              onClick={() => {
                 if (!isDragging1) {
                   onSelectSite(item as unknown as PortalSite);
                 }
               }}
-              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[440px] h-[190px] sm:h-[240px] md:h-[270px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1"
+              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1 cursor-pointer"
             >
               <img
-                src={item.gif}
+                src={item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
                 alt={item.title}
                 loading="lazy"
                 draggable={false}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = item.gif;
+                }}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
               />
 
-              {/* Status & Company Badge */}
+              {/* Status & Live Badge */}
               <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/85 text-white backdrop-blur-md border border-white/20">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/90 text-white backdrop-blur-md border border-white/20">
                   {item.company}
                 </span>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold text-white backdrop-blur-md ${
-                    item.statusColor === 'emerald'
-                      ? 'bg-[#059669]'
-                      : item.statusColor === 'amber'
-                      ? 'bg-[#F59E0B]'
-                      : 'bg-[#D94F2B]'
-                  }`}
-                >
-                  {item.status}
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white bg-[#059669] backdrop-blur-md flex items-center gap-1">
+                  <Globe className="w-3 h-3" />
+                  Live Web
                 </span>
               </div>
 
@@ -251,14 +250,14 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
       <div className="relative group">
         <button
           onClick={() => nudgeRow2('left')}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
           title="Geser Kiri"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
         <button
           onClick={() => nudgeRow2('right')}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 border border-[#E2E8F0] text-[#1B3A6B] shadow-lg flex items-center justify-center hover:bg-[#1B3A6B] hover:text-white transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
           title="Geser Kanan"
         >
           <ChevronRight className="w-6 h-6" />
@@ -270,44 +269,40 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
           onMouseLeave={handleMouseLeave2}
           onMouseUp={handleMouseUp2}
           onMouseMove={handleMouseMove2}
-          className={`flex gap-4 overflow-x-auto scrollbar-none px-6 no-scrollbar ${
-            isDragging2 ? 'cursor-grabbing scroll-auto' : 'cursor-grab'
+          className={`flex gap-4 overflow-x-auto px-6 no-scrollbar ${
+            isDragging2 ? 'cursor-grabbing' : 'cursor-grab'
           }`}
-          style={{ scrollBehavior: isDragging2 ? 'auto' : 'smooth' }}
+          style={{ scrollBehavior: 'auto' }}
         >
           {row2Items.map((item, idx) => (
             <div
               key={`row2-${item.id}-${idx}`}
-              onClick={(e) => {
+              onClick={() => {
                 if (!isDragging2) {
                   onSelectSite(item as unknown as PortalSite);
                 }
               }}
-              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[440px] h-[190px] sm:h-[240px] md:h-[270px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1"
+              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1 cursor-pointer"
             >
               <img
-                src={item.gif}
+                src={item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
                 alt={item.title}
                 loading="lazy"
                 draggable={false}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = item.gif;
+                }}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
               />
 
-              {/* Status & Company Badge */}
+              {/* Status & Live Badge */}
               <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/85 text-white backdrop-blur-md border border-white/20">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/90 text-white backdrop-blur-md border border-white/20">
                   {item.company}
                 </span>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold text-white backdrop-blur-md ${
-                    item.statusColor === 'emerald'
-                      ? 'bg-[#059669]'
-                      : item.statusColor === 'amber'
-                      ? 'bg-[#F59E0B]'
-                      : 'bg-[#D94F2B]'
-                  }`}
-                >
-                  {item.status}
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white bg-[#059669] backdrop-blur-md flex items-center gap-1">
+                  <Globe className="w-3 h-3" />
+                  Live Web
                 </span>
               </div>
 

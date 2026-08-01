@@ -1,4 +1,5 @@
 import { PortalSite, ProjectCardData, ServiceItem } from '../types';
+import erpppImg from '../assets/images/erppp.jpg';
 
 export interface CompanyInfo {
   name: string;
@@ -19,9 +20,9 @@ export const COMPANY_INFO: CompanyInfo = {
   subtagline: 'Satu pintu akses terpadu untuk seluruh sistem operasional, portal manajemen, dan layanan digital MKN.',
   established: '2021',
   location: 'Jakarta, Indonesia',
-  totalProjects: '14 Portal',
-  activePortals: '14 Portal Live',
-  clientCount: '6 Kategori',
+  totalProjects: '4 Portal',
+  activePortals: '4 Portal Live',
+  clientCount: '2 Kategori',
   satisfactionRate: '99.99%',
   authType: 'SSO Enforced'
 };
@@ -37,181 +38,63 @@ export interface MarqueeItem {
   description: string;
   status: 'Active' | 'Beta' | 'Enterprise';
   statusColor: 'emerald' | 'amber' | 'red';
+  customImage?: string;
 }
 
 export const MARQUEE_PORTALS: MarqueeItem[] = [
   {
-    id: 'mkn-orbital-portal',
-    title: 'MKN Orbital Portal',
-    company: 'Operasional Satelit',
-    gif: 'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
-    url: 'https://spacevoyage.example.com',
-    category: 'Operasional & Sistem',
-    tags: ['Monitoring Realtime', 'Telemetri', 'Internal'],
-    description: 'Portal pemantauan sistem operasional dan telemetri jaringan utama Synergy MKN Onwards.',
-    status: 'Active',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-devhub-portal',
-    title: 'MKN DevHub Portal',
-    company: 'Dev & API Suite',
+    id: 'mkn-smart-portal',
+    title: 'MKN Smart Portal',
+    company: 'MKN Smart System',
     gif: 'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
-    url: 'https://codenest.example.com',
-    category: 'Pengembang & Infrastruktur',
-    tags: ['Dokumentasi API', 'DevTools', 'SDK'],
-    description: 'Portal pusat dokumentasi API, pengujian sistem, dan pustaka integrasi untuk tim pengembang.',
+    url: 'https://mknsmart.my.id/',
+    category: 'Operasional & Sistem',
+    tags: ['MKN Smart', 'Operasional', 'Live Web', 'Realtime'],
+    description: 'Portal resmi MKN Smart untuk manajemen operasional cerdas, pemantauan sistem, dan integrasi layanan internal.',
     status: 'Active',
     statusColor: 'emerald'
   },
   {
-    id: 'mkn-capital-portal',
-    title: 'MKN Capital Portal',
-    company: 'Manajemen Keuangan',
+    id: 'mkn-pm-ops-portal',
+    title: 'MKN PM Ops Portal',
+    company: 'MKN PM Operations',
+    gif: 'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
+    url: 'https://pm.mknops.web.id/',
+    category: 'Operasional & Sistem',
+    tags: ['Preventive Maintenance', 'PM Ops', 'Live Web', 'Tracking'],
+    description: 'Portal pemeliharaan preventif (Preventive Maintenance Ops) dan sistem operasional harian untuk inspeksi, perawatan berkala, dan pemantauan perangkat.',
+    status: 'Active',
+    statusColor: 'emerald'
+  },
+  {
+    id: 'mkn-erp-portal',
+    title: 'MKN Enterprise ERP Portal',
+    company: 'MKN ERP System',
     gif: 'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
-    url: 'https://vexventures.example.com',
+    url: 'https://erp-mkn.starbit.id/login',
     category: 'Manajemen & Analitik',
-    tags: ['Keuangan Korporat', 'Alokasi Aset', 'Laporan'],
-    description: 'Portal pelaporan keuangan terpadu, alokasi anggaran, dan alur persetujuan investasi perusahaan.',
+    tags: ['ERP System', 'Starbit Cloud', 'Keuangan', 'Inventaris'],
+    description: 'Portal ERP terpadu perusahaan untuk manajemen inventaris, keuangan, sumber daya, dan modul operasional bisnis MKN.',
     status: 'Enterprise',
-    statusColor: 'emerald'
+    statusColor: 'emerald',
+    customImage: erpppImg
   },
   {
-    id: 'mkn-intelligence-engine',
-    title: 'MKN Intelligence Hub',
-    company: 'Asisten AI Perusahaan',
-    gif: 'https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif',
-    url: 'https://stellar.ai',
-    category: 'Manajemen & Analitik',
-    tags: ['AI Assistant', 'Pencarian Dokumen', 'Data Processing'],
-    description: 'Portal asisten cerdas berbasis kecerdasan buatan untuk pemrosesan data dan otomasi tugas internal.',
-    status: 'Active',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-architecture-portal',
-    title: 'MKN Architecture Hub',
-    company: 'Rancangan & Arsitektur',
-    gif: 'https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif',
-    url: 'https://asme.example.com',
-    category: 'Operasional & Sistem',
-    tags: ['Arsip Cetak Biru', 'Spesifikasi Teknik', 'Design Review'],
-    description: 'Portal repositori cetak biru arsitektur sistem, cetakan desain teknis, dan arsip rancangan resmi.',
-    status: 'Active',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-data-matrix',
-    title: 'MKN Executive Matrix',
-    company: 'Dashboard Eksekutif',
+    id: 'mkn-kpi-report-2026',
+    title: 'MKN Operation KPI East-West 2026',
+    company: 'MKN SharePoint',
     gif: 'https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif',
-    url: 'https://transformdata.example.com',
+    url: 'https://multikontrolnusantara.sharepoint.com/:x:/r/sites/MKNSangatta/_layouts/15/Doc.aspx?sourcedoc=%7B7483572E-AB8F-4594-ACDD-4CEE00CA5442%7D&file=Summary%20Report%20Operation%20KPI%20EAST%20-%20WEST%202026.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1&wdOrigin=SHAREPOINT.SHELL%2CAPPHOME-WEB.JUMPBACKIN&wdPreviousSession=3a763537-f7c9-4efe-9f5d-b3f38baea803&wdPreviousSessionSrc=AppHomeWeb&ct=1785543682830',
     category: 'Manajemen & Analitik',
-    tags: ['KPI Perusahaan', 'Metrik Utama', 'Realtime'],
-    description: 'Dashboard pemantauan KPI eksekutif, metrik pertumbuhan perusahaan, dan laporan berkala.',
-    status: 'Beta',
-    statusColor: 'amber'
-  },
-  {
-    id: 'mkn-fleet-motors',
-    title: 'MKN Fleet & Mobility',
-    company: 'Logistik & Layanan',
-    gif: 'https://motionsites.ai/assets/hero-vitara-preview-Cjz2QYyU.gif',
-    url: 'https://vitara.example.com',
-    category: 'Operasional & Sistem',
-    tags: ['Manajemen Fleet', 'Inventaris', 'Tracking'],
-    description: 'Portal pengelolaan armada operasional, pemeliharaan aset, dan pelacakan distribusi internal.',
-    status: 'Enterprise',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-sustainability-hub',
-    title: 'MKN Sustainability Hub',
-    company: 'Laporan ESG',
-    gif: 'https://motionsites.ai/assets/hero-terra-preview-BFjrCr7T.gif',
-    url: 'https://terra-eco.example.com',
-    category: 'Informasi & Publikasi',
-    tags: ['Laporan ESG', 'Lingkungan', 'Audit Hijau'],
-    description: 'Portal transparansi kinerja keberlanjutan, laporan lingkungan, dan tata kelola perusahaan (ESG).',
+    tags: ['SharePoint', 'KPI East-West 2026', 'Executive Report', 'Live Sheet'],
+    description: 'Laporan ringkasan KPI operasional wilayah East & West 2026 langsung di portal SharePoint resmi Multi Kontrol Nusantara.',
     status: 'Active',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-executive-portal',
-    title: 'MKN Corporate Service',
-    company: 'Layanan Korporat',
-    gif: 'https://motionsites.ai/assets/hero-skyelite-preview-DHaZIgUv.gif',
-    url: 'https://skyelite.example.com',
-    category: 'Layanan Karyawan & HR',
-    tags: ['Layanan Direksi', 'Perjalanan Dinas', 'Protokol'],
-    description: 'Portal koordinasi jadwal, reservasi fasilitas perusahaan, dan administrasi perjalanan dinas.',
-    status: 'Enterprise',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-sound-tech-portal',
-    title: 'MKN Lab & Testing',
-    company: 'R&D Lab Suite',
-    gif: 'https://motionsites.ai/assets/hero-aethera-preview-DknSlcTa.gif',
-    url: 'https://aetherasound.example.com',
-    category: 'Pengembang & Infrastruktur',
-    tags: ['Pengujian Produk', 'Lab R&D', 'Simulasi'],
-    description: 'Portal hasil pengujian laboratorium R&D dan pameran modul simulasi perangkat keras.',
-    status: 'Active',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-designpro',
-    title: 'MKN Design System Hub',
-    company: 'UI/UX & Brand Assets',
-    gif: 'https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif',
-    url: 'https://designpro.example.com',
-    category: 'Informasi & Publikasi',
-    tags: ['Asset Brand', 'Design Tokens', 'Pustaka UI'],
-    description: 'Portal aset resmi merek Synergy MKN Onwards, pedoman visual, dan komponen UI/UX terintegrasi.',
-    status: 'Active',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-cloud-network',
-    title: 'MKN Cloud Operations',
-    company: 'Infra & Network',
-    gif: 'https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif',
-    url: 'https://nexoracloud.example.com',
-    category: 'Pengembang & Infrastruktur',
-    tags: ['Server Status', 'Uptime 99.9%', 'Keamanan'],
-    description: 'Portal pemantauan kondisi server cloud, status konektivitas antar-cabang, dan keamanan jaringan.',
-    status: 'Enterprise',
-    statusColor: 'emerald'
-  },
-  {
-    id: 'mkn-spatial-lab',
-    title: 'MKN Innovation Portal',
-    company: 'Inovasi Digital',
-    gif: 'https://motionsites.ai/assets/hero-evr-ventures-preview-DZxeVFEX.gif',
-    url: 'https://evrventures.example.com',
-    category: 'Pengembang & Infrastruktur',
-    tags: ['R&D Inovasi', 'Eksperimen Tech', 'Prototype'],
-    description: 'Portal pameran prototipe teknologi terbaru dan proyek eksperimental internal Synergy MKN Onwards.',
-    status: 'Beta',
-    statusColor: 'amber'
-  },
-  {
-    id: 'mkn-private-wealth',
-    title: 'MKN Encrypted Portal',
-    company: 'Portal Keamanan',
-    gif: 'https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif',
-    url: 'https://wealthcapital.example.com',
-    category: 'Portal Keamanan & Akses',
-    tags: ['SSO Enforced', 'Enkripsi 256-bit', 'Kerahasiaan'],
-    description: 'Portal akses khusus dengan enkripsi ganda untuk pengelolaan dokumen rahasia dan audit internal.',
-    status: 'Enterprise',
     statusColor: 'emerald'
   }
 ];
 
-export const MARQUEE_ROW_1 = MARQUEE_PORTALS.slice(0, 7);
-export const MARQUEE_ROW_2 = MARQUEE_PORTALS.slice(7, 14);
+export const MARQUEE_ROW_1 = [MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2], MARQUEE_PORTALS[3]];
+export const MARQUEE_ROW_2 = [MARQUEE_PORTALS[2], MARQUEE_PORTALS[3], MARQUEE_PORTALS[0], MARQUEE_PORTALS[1]];
 
 export const COMPANY_SOLUTIONS: ServiceItem[] = [
   {
@@ -243,43 +126,57 @@ export const COMPANY_SOLUTIONS: ServiceItem[] = [
 
 export const FEATURED_PROJECTS: ProjectCardData[] = [
   {
-    id: 'mkn-project-01',
+    id: 'mkn-smart-featured',
     number: '01',
-    title: 'MKN Executive Matrix Portal',
+    title: 'MKN Smart Portal',
     category: 'Client',
-    type: 'Portal Dashboard Analitik & KPI Utama',
+    type: 'Portal Operasional & Layanan Cerdas',
     col1Image1: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055344_5eff02e0-87a5-41ce-b64f-eb08da8f33db.png&w=1280&q=85',
     col1Image2: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055431_11d841fd-8b41-46a5-82e4-b04f2407a7d8.png&w=1280&q=85',
     col2Image: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055451_e317bf2d-28d4-48cc-86b0-6f72f25b6327.png&w=1280&q=85',
-    liveUrl: 'https://transformdata.example.com',
-    description: 'Portal pusat bagi jajaran manajemen untuk memantau performa bisnis, visualisasi arus kas, dan indikator kunci kinerja secara real-time.',
-    techStack: ['Dashboard Analitik', 'SSO Login', 'Realtime Sync', 'Security Enforced']
+    liveUrl: 'https://mknsmart.my.id/',
+    description: 'Portal sistem operasional cerdas MKN untuk manajemen kerja terpadu, pemantauan sistem, dan akses cepat layanan internal.',
+    techStack: ['MKN Smart', 'Operasional', 'Live Web', 'Realtime']
   },
   {
-    id: 'mkn-project-02',
+    id: 'mkn-pm-ops-featured',
     number: '02',
-    title: 'MKN DevHub & API Portal',
+    title: 'MKN PM Operations Portal',
     category: 'Personal',
-    type: 'Portal Infrastruktur & Pengembang API',
+    type: 'Portal Preventive Maintenance & Pemeliharaan',
     col1Image1: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055654_911201c5-36d9-4bac7-331adfce159f.png&w=1280&q=85',
     col1Image2: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055723_5ceda0b8-d9c2-4665-b2e3-83ba19ba76d1.png&w=1280&q=85',
     col2Image: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055753_adc5dcbd-a8e6-49c0-b43a-9b030d835cea.png&w=1280&q=85',
-    liveUrl: 'https://codenest.example.com',
-    description: 'Portal dokumentasi teknis dan pengujian API interaktif bagi tim IT internal Synergy MKN Onwards untuk memastikan integrasi data yang stabil.',
-    techStack: ['DevTools', 'API Docs', 'OAuth Security', 'JSON Parser']
+    liveUrl: 'https://pm.mknops.web.id/',
+    description: 'Portal pemeliharaan preventif (Preventive Maintenance Ops) untuk pemantauan jadwal perawatan, ketersediaan perangkat, dan log teknis harian secara langsung.',
+    techStack: ['Preventive Maintenance', 'PM Ops', 'Live Web', 'Tracking']
   },
   {
-    id: 'mkn-project-03',
+    id: 'mkn-erp-featured',
     number: '03',
-    title: 'MKN Orbital Operations Portal',
+    title: 'MKN Enterprise ERP Portal',
     category: 'Client',
-    type: 'Portal Telemetri & Monitoring Operasional',
+    type: 'Portal Resource Planning & Keuangan',
     col1Image1: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055759_963cfb0b-4bd1-4b0f-9d0a-09bd6cf95b2f.png&w=1280&q=85',
     col1Image2: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_060108_438f781a-9846-4dcc-89ab-c4e6cb830f5b.png&w=1280&q=85',
-    col2Image: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055818_9d062121-ad7e-46b9-999a-1a6a692ef1ee.png&w=1280&q=85',
-    liveUrl: 'https://spacevoyage.example.com',
-    description: 'Portal monitoring sistem operasional terpusat dengan indikator visual dan grafik kondisi jaringan secara langsung.',
-    techStack: ['Live Telemetry', 'Alert System', 'Map Visualizer', 'Cloud Storage']
+    col2Image: erpppImg,
+    liveUrl: 'https://erp-mkn.starbit.id/login',
+    description: 'Portal sistem ERP perusahaan untuk integrasi inventaris, keuangan, sumber daya, dan modul proses bisnis terpusat.',
+    techStack: ['ERP System', 'Starbit Cloud', 'Keuangan', 'Inventaris'],
+    customImage: erpppImg
+  },
+  {
+    id: 'mkn-kpi-featured',
+    number: '04',
+    title: 'MKN Operation KPI East-West 2026',
+    category: 'Client',
+    type: 'Portal Laporan KPI SharePoint',
+    col1Image1: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055344_5eff02e0-87a5-41ce-b64f-eb08da8f33db.png&w=1280&q=85',
+    col1Image2: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055723_5ceda0b8-d9c2-4665-b2e3-83ba19ba76d1.png&w=1280&q=85',
+    col2Image: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055451_e317bf2d-28d4-48cc-86b0-6f72f25b6327.png&w=1280&q=85',
+    liveUrl: 'https://multikontrolnusantara.sharepoint.com/:x:/r/sites/MKNSangatta/_layouts/15/Doc.aspx?sourcedoc=%7B7483572E-AB8F-4594-ACDD-4CEE00CA5442%7D&file=Summary%20Report%20Operation%20KPI%20EAST%20-%20WEST%202026.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1&wdOrigin=SHAREPOINT.SHELL%2CAPPHOME-WEB.JUMPBACKIN&wdPreviousSession=3a763537-f7c9-4efe-9f5d-b3f38baea803&wdPreviousSessionSrc=AppHomeWeb&ct=1785543682830',
+    description: 'Dokumen laporan KPI operasional wilayah East & West tahun 2026 secara real-time di portal SharePoint resmi Multi Kontrol Nusantara.',
+    techStack: ['SharePoint', 'KPI East-West 2026', 'Executive Report', 'Live Sheet']
   }
 ];
 
