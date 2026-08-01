@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ExternalLink, Copy, Check, Sparkles, Globe, Monitor, Code } from 'lucide-react';
+import { X, ExternalLink, Copy, Check, Globe, Monitor, Code } from 'lucide-react';
 import { PortalSite } from '../../types';
 
 interface SitePreviewModalProps {
@@ -9,7 +9,7 @@ interface SitePreviewModalProps {
 
 export const SitePreviewModal: React.FC<SitePreviewModalProps> = ({ site, onClose }) => {
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'iframe' | 'screenshot' | 'motion'>('iframe');
+  const [activeTab, setActiveTab] = useState<'iframe' | 'screenshot'>('iframe');
   const [iframeError, setIframeError] = useState(false);
 
   if (!site) return null;
@@ -20,7 +20,7 @@ export const SitePreviewModal: React.FC<SitePreviewModalProps> = ({ site, onClos
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const liveScreenshotUrl = site.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${site.url}`;
+  const liveScreenshotUrl = site.customImage || site.previewImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${site.url}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-md animate-fadeIn">
@@ -95,17 +95,6 @@ export const SitePreviewModal: React.FC<SitePreviewModalProps> = ({ site, onClos
             <Globe className="w-4 h-4 text-[#059669]" />
             <span>Live Web Capture Snapshot</span>
           </button>
-          <button
-            onClick={() => setActiveTab('motion')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-              activeTab === 'motion'
-                ? 'bg-[#1B3A6B] text-white shadow-xs'
-                : 'text-[#718096] hover:text-[#1B3A6B] bg-[#F7F8FA]'
-            }`}
-          >
-            <Sparkles className="w-4 h-4 text-[#D94F2B]" />
-            <span>Animasi Capture Motion</span>
-          </button>
         </div>
 
         {/* Browser Mockup Window */}
@@ -167,27 +156,17 @@ export const SitePreviewModal: React.FC<SitePreviewModalProps> = ({ site, onClos
             {activeTab === 'screenshot' && (
               <div className="relative w-full min-h-[450px] overflow-hidden bg-slate-100 flex items-center justify-center">
                 <img
-                  src={site.customImage || liveScreenshotUrl}
+                  src={site.customImage || site.previewImage || liveScreenshotUrl}
                   alt={`Live capture of ${site.title}`}
                   className="w-full h-full object-cover object-top"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = site.gif;
+                    (e.target as HTMLImageElement).src = site.thumbnail || '';
                   }}
                 />
                 <div className="absolute bottom-3 right-3 bg-black/70 text-white text-[10px] font-bold px-3 py-1 rounded-full backdrop-blur-xs flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
                   Live Snapshot Web
                 </div>
-              </div>
-            )}
-
-            {activeTab === 'motion' && (
-              <div className="relative w-full min-h-[450px] overflow-hidden bg-slate-100">
-                <img
-                  src={site.customImage || site.previewGif || site.gif}
-                  alt={site.title}
-                  className="w-full h-full object-cover"
-                />
               </div>
             )}
           </div>

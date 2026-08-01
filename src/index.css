@@ -151,3 +151,33 @@
   animation: logoMknFloat 5s ease-in-out infinite, logoMknGlow 3s ease-in-out infinite;
 }
 
+@keyframes marqueeRight {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marqueeLeft {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee-right {
+  animation: marqueeRight 40s linear infinite;
+}
+
+.animate-marquee-left {
+  animation: marqueeLeft 40s linear infinite;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
+

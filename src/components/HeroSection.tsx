@@ -3,6 +3,7 @@ import { Magnet } from './ui/Magnet';
 import { FadeIn } from './ui/FadeIn';
 import { MKNLogo } from './ui/MKNLogo';
 import { LogoIntroModal } from './ui/LogoIntroModal';
+import { VideoModal } from './ui/VideoModal';
 import { COMPANY_INFO, DECORATIVE_IMAGES } from '../data/portalData';
 import { Shield, Sparkles, Building2, Globe, Layers, ArrowRight, Play } from 'lucide-react';
 
@@ -13,6 +14,7 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavigate }) => {
   const [isIntroOpen, setIsIntroOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   return (
     <div className="relative bg-[#F7F8FA]">
@@ -140,17 +142,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
                   inactiveTransition="transform 0.6s ease-in-out"
                   className="w-full max-w-[360px] sm:max-w-[400px] mx-auto"
                 >
-                  <div className="relative mx-auto w-full">
+                  <div
+                    className="relative mx-auto w-full cursor-pointer group"
+                    onClick={() => setIsVideoModalOpen(true)}
+                    title="Klik untuk memutar video MKN Onwards"
+                  >
                     {/* Decorative Glow */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-[#1B3A6B] to-[#D94F2B] rounded-3xl blur-xl opacity-15 transform scale-95" />
 
                     {/* Main Card Graphic */}
-                    <div className="relative bg-white/95 backdrop-blur-xl border border-[#E2E8F0] p-5 rounded-3xl shadow-xl overflow-hidden">
-                      <img
-                        src={DECORATIVE_IMAGES.gifOnward}
-                        alt="MKN Onwards Animation"
-                        className="w-full h-auto max-h-[280px] object-contain rounded-2xl"
-                      />
+                    <div className="relative bg-white/95 backdrop-blur-xl border border-[#E2E8F0] p-5 rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]">
+                      <div className="relative">
+                        <img
+                          src={DECORATIVE_IMAGES.gifOnward}
+                          alt="MKN Onwards Animation"
+                          className="w-full h-auto max-h-[280px] object-contain rounded-2xl"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 rounded-2xl flex items-center justify-center z-10">
+                          <div className="w-16 h-16 rounded-full bg-white/90 shadow-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <Play className="w-8 h-8 text-[#1B3A6B] fill-[#1B3A6B] ml-1" />
+                          </div>
+                        </div>
+                      </div>
 
                       <div className="mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-[#1B3A6B] to-[#D94F2B] border border-[#E2E8F0]">
                         <div className="flex items-center justify-between mb-1">
@@ -187,6 +200,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
 
       {/* 3D Intro Video Modal */}
       <LogoIntroModal isOpen={isIntroOpen} onClose={() => setIsIntroOpen(false)} />
+
+      {/* Onwards Video Modal */}
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        videoUrl={DECORATIVE_IMAGES.videoOnward}
+        title="MKN Onwards"
+      />
     </div>
   );
 };

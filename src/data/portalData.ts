@@ -2,6 +2,10 @@ import { PortalSite, ProjectCardData, ServiceItem } from '../types';
 import erpppImg from '../assets/images/erppp.jpg';
 import logoMkn from '../assets/images/logo_mkn.png';
 import gifOnward from '../assets/images/gif onward.gif';
+import videoOnward from '../assets/images/onward.mp4';
+import hsesclassImg from '../assets/images/hsesclass.png';
+import msdclassImg from '../assets/images/msdclass.png';
+import cctvmknImg from '../assets/images/cctvmkn.png';
 
 export interface CompanyInfo {
   name: string;
@@ -22,9 +26,9 @@ export const COMPANY_INFO: CompanyInfo = {
   subtagline: 'Satu pintu akses terpadu untuk seluruh sistem operasional, portal manajemen, dan layanan digital MKN.',
   established: '2021',
   location: 'Jakarta, Indonesia',
-  totalProjects: '4 Portal',
-  activePortals: '4 Portal Live',
-  clientCount: '2 Kategori',
+  totalProjects: '7 Portal',
+  activePortals: '7 Portal Live',
+  clientCount: '5 Kategori',
   satisfactionRate: '99.99%',
   authType: 'SSO Enforced'
 };
@@ -41,6 +45,7 @@ export interface MarqueeItem {
   status: 'Active' | 'Beta' | 'Enterprise';
   statusColor: 'emerald' | 'amber' | 'red';
   customImage?: string;
+  previewImage?: string;
 }
 
 export const MARQUEE_PORTALS: MarqueeItem[] = [
@@ -92,11 +97,51 @@ export const MARQUEE_PORTALS: MarqueeItem[] = [
     description: 'Laporan ringkasan KPI operasional wilayah East & West 2026 langsung di portal SharePoint resmi Multi Kontrol Nusantara.',
     status: 'Active',
     statusColor: 'emerald'
+  },
+  {
+    id: 'hses-kpc-training',
+    title: 'HSES KPC Daftar Training',
+    company: 'KPC HSES Class',
+    gif: 'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
+    url: 'https://kpc-hsesclass.azurewebsites.net/',
+    category: 'Training & Sertifikasi',
+    tags: ['HSES', 'KPC', 'Training', 'Safety'],
+    description: 'Portal pendaftaran dan manajemen pelatihan HSES (Health, Safety, Environment & Security) KPC untuk karyawan dan kontraktor.',
+    status: 'Active',
+    statusColor: 'emerald',
+    previewImage: hsesclassImg
+  },
+  {
+    id: 'msd-refresh',
+    title: 'MSD Refresh',
+    company: 'MSD Portal',
+    gif: 'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
+    url: 'https://atdportal.netlify.app/',
+    category: 'Layanan & Dukungan',
+    tags: ['MSD', 'Portal', 'Layanan', 'Dukungan'],
+    description: 'Portal MSD untuk layanan dan dukungan teknis perusahaan.',
+    status: 'Active',
+    statusColor: 'emerald',
+    previewImage: msdclassImg
+  },
+
+  {
+    id: 'cctv-mkn-site',
+    title: 'CCTV MKN SITE',
+    company: 'MKN Security System',
+    gif: 'https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif',
+    url: 'http://10.80.16.29/doc/page/login.asp?_1785559389694',
+    category: 'Keamanan & Monitoring',
+    tags: ['CCTV', 'Security', 'Monitoring', 'Local Network'],
+    description: 'Portal monitoring CCTV MKN Site. Catatan: Hanya dapat diakses melalui IE Mode dan Local Network MKN.',
+    status: 'Active',
+    statusColor: 'amber',
+    previewImage: cctvmknImg
   }
 ];
 
-export const MARQUEE_ROW_1 = [MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2], MARQUEE_PORTALS[3]];
-export const MARQUEE_ROW_2 = [MARQUEE_PORTALS[2], MARQUEE_PORTALS[3], MARQUEE_PORTALS[0], MARQUEE_PORTALS[1]];
+export const MARQUEE_ROW_1 = [MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2], MARQUEE_PORTALS[3], MARQUEE_PORTALS[4], MARQUEE_PORTALS[5], MARQUEE_PORTALS[6]];
+export const MARQUEE_ROW_2 = [MARQUEE_PORTALS[3], MARQUEE_PORTALS[4], MARQUEE_PORTALS[5], MARQUEE_PORTALS[6], MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2]];
 
 export const COMPANY_SOLUTIONS: ServiceItem[] = [
   {
@@ -188,5 +233,6 @@ export const DECORATIVE_IMAGES = {
   legoIcon: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png',
   group3D: logoMkn,
   heroPortrait: 'https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png',
-  gifOnward: gifOnward
+  gifOnward: gifOnward,
+  videoOnward: videoOnward
 };

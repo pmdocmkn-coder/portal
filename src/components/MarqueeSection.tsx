@@ -10,81 +10,43 @@ interface MarqueeSectionProps {
 export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) => {
   const containerRef1 = useRef<HTMLDivElement>(null);
   const containerRef2 = useRef<HTMLDivElement>(null);
+  const innerRef1 = useRef<HTMLDivElement>(null);
+  const innerRef2 = useRef<HTMLDivElement>(null);
 
-  // Drag state for Row 1
   const [isDragging1, setIsDragging1] = useState(false);
   const [startX1, setStartX1] = useState(0);
   const [scrollLeft1, setScrollLeft1] = useState(0);
 
-  // Drag state for Row 2
   const [isDragging2, setIsDragging2] = useState(false);
   const [startX2, setStartX2] = useState(0);
   const [scrollLeft2, setScrollLeft2] = useState(0);
 
-  // Auto-scroll animation ref
-  const animFrameRef = useRef<number | null>(null);
+  const [isPaused1, setIsPaused1] = useState(false);
+  const [isPaused2, setIsPaused2] = useState(false);
 
-  useEffect(() => {
-    // Initial scroll setup for row 2 to start centered
-    if (containerRef2.current) {
-      containerRef2.current.scrollLeft = containerRef2.current.scrollWidth / 4;
-    }
-  }, []);
-
-  // Continuous gentle marquee loop when not dragging
-  useEffect(() => {
-    let lastTime = performance.now();
-
-    const animate = (now: number) => {
-      const delta = (now - lastTime) / 1000;
-      lastTime = Math.min(now, lastTime + 100); // cap max delta to avoid huge jumps on tab switch
-
-      // Row 1 continuous scroll right
-      if (containerRef1.current && !isDragging1) {
-        const el = containerRef1.current;
-        el.scrollLeft += 45 * delta;
-        const halfWidth = el.scrollWidth / 2;
-        if (el.scrollLeft >= halfWidth) {
-          el.scrollLeft -= halfWidth;
-        }
-      }
-
-      // Row 2 continuous scroll left
-      if (containerRef2.current && !isDragging2) {
-        const el = containerRef2.current;
-        el.scrollLeft -= 45 * delta;
-        const halfWidth = el.scrollWidth / 2;
-        if (el.scrollLeft <= 5) {
-          el.scrollLeft += halfWidth;
-        }
-      }
-
-      animFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    animFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [isDragging1, isDragging2]);
+  // Duplicate items 2 times for seamless infinite continuous looping
+  const row1Items = [...MARQUEE_ROW_1, ...MARQUEE_ROW_1];
+  const row2Items = [...MARQUEE_ROW_2, ...MARQUEE_ROW_2];
 
   // Mouse & Touch Drag Handlers for Row 1
   const handleMouseDown1 = (e: React.MouseEvent) => {
     if (!containerRef1.current) return;
     setIsDragging1(true);
+    setIsPaused1(true);
     setStartX1(e.pageX - containerRef1.current.offsetLeft);
     setScrollLeft1(containerRef1.current.scrollLeft);
   };
 
-  const handleMouseLeave1 = () => setIsDragging1(false);
-  const handleMouseUp1 = () => setIsDragging1(false);
+  const handleMouseUp1 = () => {
+    setIsDragging1(false);
+    setTimeout(() => setIsPaused1(false), 500);
+  };
 
   const handleMouseMove1 = (e: React.MouseEvent) => {
     if (!isDragging1 || !containerRef1.current) return;
     e.preventDefault();
     const x = e.pageX - containerRef1.current.offsetLeft;
-    const walk = (x - startX1) * 1.8;
+    const walk = (x - startX1) * 1.5;
     containerRef1.current.scrollLeft = scrollLeft1 - walk;
   };
 
@@ -92,18 +54,21 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
   const handleMouseDown2 = (e: React.MouseEvent) => {
     if (!containerRef2.current) return;
     setIsDragging2(true);
+    setIsPaused2(true);
     setStartX2(e.pageX - containerRef2.current.offsetLeft);
     setScrollLeft2(containerRef2.current.scrollLeft);
   };
 
-  const handleMouseLeave2 = () => setIsDragging2(false);
-  const handleMouseUp2 = () => setIsDragging2(false);
+  const handleMouseUp2 = () => {
+    setIsDragging2(false);
+    setTimeout(() => setIsPaused2(false), 500);
+  };
 
   const handleMouseMove2 = (e: React.MouseEvent) => {
     if (!isDragging2 || !containerRef2.current) return;
     e.preventDefault();
     const x = e.pageX - containerRef2.current.offsetLeft;
-    const walk = (x - startX2) * 1.8;
+    const walk = (x - startX2) * 1.5;
     containerRef2.current.scrollLeft = scrollLeft2 - walk;
   };
 
@@ -125,10 +90,6 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
       });
     }
   };
-
-  // Duplicate items 4 times for seamless infinite continuous looping
-  const row1Items = [...MARQUEE_ROW_1, ...MARQUEE_ROW_1, ...MARQUEE_ROW_1, ...MARQUEE_ROW_1];
-  const row2Items = [...MARQUEE_ROW_2, ...MARQUEE_ROW_2, ...MARQUEE_ROW_2, ...MARQUEE_ROW_2];
 
   return (
     <section className="relative bg-[#F7F8FA] border-y border-[#E2E8F0] py-16 overflow-hidden select-none">
@@ -182,67 +143,73 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
         <div
           ref={containerRef1}
           onMouseDown={handleMouseDown1}
-          onMouseLeave={handleMouseLeave1}
           onMouseUp={handleMouseUp1}
           onMouseMove={handleMouseMove1}
-          className={`flex gap-4 overflow-x-auto px-6 no-scrollbar ${
-            isDragging1 ? 'cursor-grabbing' : 'cursor-grab'
-          }`}
-          style={{ scrollBehavior: 'auto' }}
+          onMouseLeave={() => {
+            setIsDragging1(false);
+            setTimeout(() => setIsPaused1(false), 500);
+          }}
+          className="overflow-hidden px-6"
         >
-          {row1Items.map((item, idx) => (
-            <div
-              key={`row1-${item.id}-${idx}`}
-              onClick={() => {
-                if (!isDragging1) {
-                  onSelectSite(item as unknown as PortalSite);
-                }
-              }}
-              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1 cursor-pointer"
-            >
-              <img
-                src={item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
-                alt={item.title}
-                loading="lazy"
-                draggable={false}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = item.gif;
+          <div
+            ref={innerRef1}
+            className={`flex gap-4 will-change-transform ${isDragging1 ? 'cursor-grabbing' : 'cursor-grab'} ${!isPaused1 ? 'animate-marquee-right' : ''}`}
+            style={{ width: 'fit-content' }}
+          >
+            {row1Items.map((item, idx) => (
+              <div
+                key={`row1-${item.id}-${idx}`}
+                onClick={() => {
+                  if (!isDragging1) {
+                    onSelectSite(item as unknown as PortalSite);
+                  }
                 }}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
-              />
+                className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1 cursor-pointer"
+              >
+                <img
+                  src={item.previewImage || item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
+                  alt={item.title}
+                  loading="lazy"
+                  draggable={false}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = item.gif;
+                  }}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
+                />
 
-              {/* Status & Live Badge */}
-              <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/90 text-white backdrop-blur-md border border-white/20">
-                  {item.company}
-                </span>
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white bg-[#059669] backdrop-blur-md flex items-center gap-1">
-                  <Globe className="w-3 h-3" />
-                  Live Web
-                </span>
-              </div>
+                {/* Status & Live Badge */}
+                <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/90 text-white backdrop-blur-md border border-white/20">
+                    {item.company}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white bg-[#059669] backdrop-blur-md flex items-center gap-1">
+                    <Globe className="w-3 h-3" />
+                    Live Web
+                  </span>
+                </div>
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A6B]/95 via-[#1B3A6B]/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                <div className="flex items-end justify-between text-white">
-                  <div>
-                    <span className="text-[11px] uppercase tracking-wider font-semibold text-[#E86547]">
-                      {item.category}
-                    </span>
-                    <h4 className="font-bold text-base sm:text-lg text-white leading-tight mt-0.5">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-[#E2E8F0] line-clamp-2 mt-1">
-                      {item.description}
-                    </p>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-[#D94F2B] text-white flex items-center justify-center shadow-md flex-shrink-0 ml-3">
-                    <Eye className="w-5 h-5" />
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A6B]/95 via-[#1B3A6B]/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                  <div className="flex items-end justify-between text-white">
+                    <div>
+                      <span className="text-[11px] uppercase tracking-wider font-semibold text-[#E86547]">
+                        {item.category}
+                      </span>
+                      <h4 className="font-bold text-base sm:text-lg text-white leading-tight mt-0.5">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-[#E2E8F0] line-clamp-2 mt-1">
+                        {item.description}
+                      </p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-[#D94F2B] text-white flex items-center justify-center shadow-md flex-shrink-0 ml-3">
+                      <Eye className="w-5 h-5" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
@@ -266,67 +233,73 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
         <div
           ref={containerRef2}
           onMouseDown={handleMouseDown2}
-          onMouseLeave={handleMouseLeave2}
           onMouseUp={handleMouseUp2}
           onMouseMove={handleMouseMove2}
-          className={`flex gap-4 overflow-x-auto px-6 no-scrollbar ${
-            isDragging2 ? 'cursor-grabbing' : 'cursor-grab'
-          }`}
-          style={{ scrollBehavior: 'auto' }}
+          onMouseLeave={() => {
+            setIsDragging2(false);
+            setTimeout(() => setIsPaused2(false), 500);
+          }}
+          className="overflow-hidden px-6"
         >
-          {row2Items.map((item, idx) => (
-            <div
-              key={`row2-${item.id}-${idx}`}
-              onClick={() => {
-                if (!isDragging2) {
-                  onSelectSite(item as unknown as PortalSite);
-                }
-              }}
-              className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1 cursor-pointer"
-            >
-              <img
-                src={item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
-                alt={item.title}
-                loading="lazy"
-                draggable={false}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = item.gif;
+          <div
+            ref={innerRef2}
+            className={`flex gap-4 will-change-transform ${isDragging2 ? 'cursor-grabbing' : 'cursor-grab'} ${!isPaused2 ? 'animate-marquee-left' : ''}`}
+            style={{ width: 'fit-content' }}
+          >
+            {row2Items.map((item, idx) => (
+              <div
+                key={`row2-${item.id}-${idx}`}
+                onClick={() => {
+                  if (!isDragging2) {
+                    onSelectSite(item as unknown as PortalSite);
+                  }
                 }}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
-              />
+                className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-md group/card transition-all duration-300 hover:shadow-xl hover:border-[#2B6CB0] hover:-translate-y-1 cursor-pointer"
+              >
+                <img
+                  src={item.previewImage || item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
+                  alt={item.title}
+                  loading="lazy"
+                  draggable={false}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = item.gif;
+                  }}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105 pointer-events-none"
+                />
 
-              {/* Status & Live Badge */}
-              <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/90 text-white backdrop-blur-md border border-white/20">
-                  {item.company}
-                </span>
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white bg-[#059669] backdrop-blur-md flex items-center gap-1">
-                  <Globe className="w-3 h-3" />
-                  Live Web
-                </span>
-              </div>
+                {/* Status & Live Badge */}
+                <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1B3A6B]/90 text-white backdrop-blur-md border border-white/20">
+                    {item.company}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-white bg-[#059669] backdrop-blur-md flex items-center gap-1">
+                    <Globe className="w-3 h-3" />
+                    Live Web
+                  </span>
+                </div>
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A6B]/95 via-[#1B3A6B]/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                <div className="flex items-end justify-between text-white">
-                  <div>
-                    <span className="text-[11px] uppercase tracking-wider font-semibold text-[#E86547]">
-                      {item.category}
-                    </span>
-                    <h4 className="font-bold text-base sm:text-lg text-white leading-tight mt-0.5">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-[#E2E8F0] line-clamp-2 mt-1">
-                      {item.description}
-                    </p>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-[#D94F2B] text-white flex items-center justify-center shadow-md flex-shrink-0 ml-3">
-                    <Eye className="w-5 h-5" />
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A6B]/95 via-[#1B3A6B]/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                  <div className="flex items-end justify-between text-white">
+                    <div>
+                      <span className="text-[11px] uppercase tracking-wider font-semibold text-[#E86547]">
+                        {item.category}
+                      </span>
+                      <h4 className="font-bold text-base sm:text-lg text-white leading-tight mt-0.5">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-[#E2E8F0] line-clamp-2 mt-1">
+                        {item.description}
+                      </p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-[#D94F2B] text-white flex items-center justify-center shadow-md flex-shrink-0 ml-3">
+                      <Eye className="w-5 h-5" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
