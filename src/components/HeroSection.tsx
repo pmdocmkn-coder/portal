@@ -127,9 +127,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
             </div>
           </FadeIn>
 
-          {/* Overlapping Cards Swiper */}
-          <div className="w-full relative mb-12">
-            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-8 hide-scrollbar items-stretch px-4 md:px-8">
+          {/* Overlapping Cards Swiper (Video Game Style Selection) */}
+          <div className="w-full relative mb-12 max-w-7xl mx-auto">
+            {/* Fade edges for seamless carousel look (visible only on small/medium screens where it overflows) */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-[#0B1120] to-transparent z-20 pointer-events-none xl:hidden" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-[#0B1120] to-transparent z-20 pointer-events-none xl:hidden" />
+            
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 md:gap-10 pb-8 pt-6 hide-scrollbar items-start justify-start xl:justify-center px-6 md:px-12 xl:px-0">
               {filteredPortals.map((portal, idx) => {
                 // Determine theme index (use original index for consistent color if filtered, but we'll use mapped idx for simplicity)
                 const themeIdx = MARQUEE_PORTALS.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
@@ -141,44 +145,32 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
                     y={30} 
                     delay={0.05 * idx} 
                     duration={0.5} 
-                    className="flex-shrink-0 snap-center w-[260px] sm:w-[280px] h-[360px]"
+                    className="flex-shrink-0 snap-center flex flex-col items-center gap-4 w-[110px] sm:w-[130px] md:w-[150px]"
                   >
                     <a 
                       href={portal.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group relative flex flex-col justify-between w-full h-full rounded-2xl overflow-hidden border ${theme.border} ${theme.glow} transition-all duration-300 cursor-pointer`}
+                      className={`group relative flex flex-col items-center justify-center w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-[3px] ${theme.border} ${theme.glow} shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-2 hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] cursor-pointer ring-4 ring-[#0B1120]`}
                     >
-                      {/* Card Background Image & Gradients */}
+                      {/* Background Image */}
                       <div 
-                        className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay group-hover:scale-105 transition-transform duration-700" 
+                        className="absolute inset-0 bg-cover bg-center opacity-50 mix-blend-overlay group-hover:scale-125 group-hover:opacity-80 transition-all duration-700" 
                         style={{ backgroundImage: `url(${portal.previewImage || portal.customImage || 'https://image.thum.io/get/width/1280/crop/800/noanimate/' + portal.url})` }}
                       />
-                      <div className={`absolute inset-0 bg-gradient-to-b ${theme.from} ${theme.to} pointer-events-none`} />
+                      {/* Gradients */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${theme.from} ${theme.to} pointer-events-none`} />
                       
-                      {/* Card Content */}
-                      <div className="relative z-10 flex flex-col items-center p-6 h-full text-center">
-                        {/* Icon Circle */}
-                        <div className={`w-16 h-16 rounded-full border border-white/20 flex items-center justify-center mb-6 bg-[#0B1120]/50 backdrop-blur-sm group-hover:scale-110 transition-transform duration-300`}>
-                          {getIconForPortal(themeIdx, theme.icon)}
-                        </div>
-
-                        <h3 className="text-lg font-bold text-white mb-2 leading-tight">
-                          {portal.title}
-                        </h3>
-                        
-                        <p className="text-xs text-white/60 font-medium line-clamp-3 mb-6">
-                          {portal.description}
-                        </p>
-
-                        <div className="mt-auto w-full">
-                           <div className={`w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs font-bold text-white ${theme.button} transition-colors border border-white/10`}>
-                             Akses Sekarang
-                             <ArrowRight className="w-3.5 h-3.5" />
-                           </div>
-                        </div>
+                      {/* Icon */}
+                      <div className="relative z-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        {getIconForPortal(themeIdx, `${theme.icon} w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 drop-shadow-lg`)}
                       </div>
                     </a>
+
+                    {/* Portal Name */}
+                    <h3 className="text-xs sm:text-sm md:text-base font-bold text-white/80 text-center leading-snug group-hover:text-white transition-colors line-clamp-2 px-1">
+                      {portal.title}
+                    </h3>
                   </FadeIn>
                 );
               })}
