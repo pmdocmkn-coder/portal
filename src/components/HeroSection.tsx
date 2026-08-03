@@ -1,214 +1,207 @@
-import React, { useState } from 'react';
-import { Magnet } from './ui/Magnet';
+import React, { useState, useMemo } from 'react';
 import { FadeIn } from './ui/FadeIn';
 import { MKNLogo } from './ui/MKNLogo';
 import { LogoIntroModal } from './ui/LogoIntroModal';
-import { VideoModal } from './ui/VideoModal';
-import { COMPANY_INFO, DECORATIVE_IMAGES } from '../data/portalData';
-import { Shield, Sparkles, Building2, Globe, Layers, ArrowRight, Play } from 'lucide-react';
+import { COMPANY_INFO, MARQUEE_PORTALS, DECORATIVE_IMAGES } from '../data/portalData';
+import { ArrowRight, Play, Search, LayoutGrid, Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv } from 'lucide-react';
 
 interface HeroSectionProps {
   onOpenContact: () => void;
   onNavigate: (sectionId: string) => void;
 }
 
+const CARD_THEMES = [
+  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-blue-500/40', glow: 'hover:shadow-[0_0_30px_rgba(59,130,246,0.25)]', button: 'bg-[#1e3a8a] hover:bg-blue-600', icon: 'text-blue-400', iconBorder: 'border-blue-400/50', img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600' },
+  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-emerald-500/40', glow: 'hover:shadow-[0_0_30px_rgba(16,185,129,0.25)]', button: 'bg-[#064e3b] hover:bg-emerald-600', icon: 'text-emerald-400', iconBorder: 'border-emerald-400/50', img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600' },
+  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-amber-500/40', glow: 'hover:shadow-[0_0_30px_rgba(245,158,11,0.25)]', button: 'bg-[#78350f] hover:bg-amber-600', icon: 'text-amber-400', iconBorder: 'border-amber-400/50', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600' },
+  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-purple-500/40', glow: 'hover:shadow-[0_0_30px_rgba(139,92,246,0.25)]', button: 'bg-[#4c1d95] hover:bg-purple-600', icon: 'text-purple-400', iconBorder: 'border-purple-400/50', img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600' },
+  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-teal-500/40', glow: 'hover:shadow-[0_0_30px_rgba(20,184,166,0.25)]', button: 'bg-[#134e4a] hover:bg-teal-600', icon: 'text-teal-400', iconBorder: 'border-teal-400/50', img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600' },
+  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-slate-500/40', glow: 'hover:shadow-[0_0_30px_rgba(100,116,139,0.25)]', button: 'bg-[#1e293b] hover:bg-slate-600', icon: 'text-slate-400', iconBorder: 'border-slate-400/50', img: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=600' },
+  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-cyan-500/40', glow: 'hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]', button: 'bg-[#164e63] hover:bg-cyan-600', icon: 'text-cyan-400', iconBorder: 'border-cyan-400/50', img: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=600' },
+];
+
+const getIconForPortal = (index: number, className: string) => {
+  const icons = [Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv];
+  const Icon = icons[index % icons.length];
+  return <Icon className={className} strokeWidth={1.5} />;
+};
+
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavigate }) => {
   const [isIntroOpen, setIsIntroOpen] = useState(false);
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredPortals = useMemo(() => {
+    if (!searchQuery) return MARQUEE_PORTALS;
+    const lowerQuery = searchQuery.toLowerCase();
+    return MARQUEE_PORTALS.filter(p => 
+      p.title.toLowerCase().includes(lowerQuery) || 
+      p.description.toLowerCase().includes(lowerQuery)
+    );
+  }, [searchQuery]);
 
   return (
-    <div className="relative bg-[#F7F8FA]">
-      {/* 1. STICKY TOP NAVBAR (z-50 ensures menu is always clickable) */}
-      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] shadow-xs transition-all">
+    <div className="relative bg-[#0B1120] min-h-screen text-white font-sans selection:bg-[#3B82F6] selection:text-white">
+      {/* Background Image & Overlay */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity"
+        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop")' }}
+      />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0B1120]/80 via-[#0B1120]/60 to-[#0B1120] pointer-events-none" />
+
+      {/* STICKY TOP NAVBAR (Dark Theme) */}
+      <header className="sticky top-0 z-50 w-full bg-[#0B1120]/80 backdrop-blur-xl border-b border-white/10 shadow-lg transition-all">
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-3.5 flex items-center justify-between gap-4">
-          {/* Official Animated MKN Logo (Click to play 3D intro modal) */}
-          <div className="cursor-pointer" onClick={() => setIsIntroOpen(true)} title="Klik untuk putar 3D Intro Motion Logo">
-            <MKNLogo size="md" showSubtext={true} interactive={true} />
+          <div className="cursor-pointer flex items-center gap-2" onClick={() => setIsIntroOpen(true)} title="Klik untuk putar 3D Intro Motion Logo">
+             {/* Using standard text for logo to match minimal dark theme */}
+             <div className="font-black text-xl tracking-tight text-white flex items-center gap-2">
+                <div className="w-8 h-8 rounded bg-gradient-to-br from-[#3B82F6] to-[#1D4ED8] flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">MKN</span>
+                </div>
+                <span>PORTAL HUB</span>
+             </div>
           </div>
 
-          {/* Navigation Menu Links */}
-          <nav className="hidden lg:flex items-center gap-1.5 bg-[#F7F8FA] p-1.5 rounded-full border border-[#E2E8F0] shadow-xs">
-            <button
-              onClick={() => setIsIntroOpen(true)}
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-[#FF5500] bg-orange-50 border border-orange-200 hover:bg-orange-100 transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <Play className="w-3.5 h-3.5 fill-[#FF5500]" />
-              Intro 3D Logo
-            </button>
+          <nav className="hidden lg:flex items-center gap-1.5 bg-white/5 p-1.5 rounded-full border border-white/10 shadow-inner">
             <button
               onClick={() => onNavigate('gallery')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-[#1B3A6B] bg-white border border-[#E2E8F0] shadow-xs hover:text-[#D94F2B] transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-4 py-2 rounded-full text-xs font-bold text-white bg-white/10 border border-white/5 shadow-xs hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1.5"
             >
-              <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               Direktori Portal Live
             </button>
             <button
               onClick={() => onNavigate('overview')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-[#1A202C] hover:text-[#1B3A6B] hover:bg-white transition-all cursor-pointer"
+              className="px-4 py-2 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
             >
               Tentang MKN
             </button>
             <button
               onClick={() => onNavigate('projects')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-[#1A202C] hover:text-[#1B3A6B] hover:bg-white transition-all cursor-pointer"
+              className="px-4 py-2 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
             >
               Portal Utama
             </button>
           </nav>
 
-          {/* Action Buttons */}
           <div className="flex items-center gap-3">
             <button
               onClick={onOpenContact}
-              className="bg-[#1B3A6B] hover:bg-[#2B6CB0] text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+              className="bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all shadow-sm flex items-center gap-2 cursor-pointer"
             >
               <span>Hubungi Kami</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#E86547]" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* 2. MAIN HERO SECTION WITH SAFE MARGIN BOUNDARIES */}
-      <section className="relative min-h-[85vh] flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#F7F8FA] via-white to-[#F7F8FA] select-none pt-8 pb-12 border-b border-[#E2E8F0]">
-        {/* Background Decorative Grid */}
-        <div className="absolute inset-0 bg-[radial-gradient(#2B6CB0_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
+      {/* MAIN HERO CONTENT */}
+      <section className="relative z-10 flex flex-col items-center justify-start pt-16 pb-24 text-center min-h-[calc(100vh-76px)]">
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col items-center">
+          
+          <FadeIn y={20} delay={0.1} duration={0.6}>
+            <p className="text-white/80 text-sm md:text-base font-medium tracking-wide mb-2">
+              Selamat Datang di
+            </p>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight mb-4 flex items-center justify-center gap-3">
+              <span className="text-[#3B82F6] drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">MKN</span>
+              <span className="text-white">PORTAL</span>
+            </h1>
+            <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto mb-10 font-medium">
+              Satu portal untuk semua sistem. Pilih layanan yang ingin Anda akses.
+            </p>
+          </FadeIn>
 
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 my-auto py-6 z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left Column: Text & Call to Actions */}
-            <div className="lg:col-span-7 text-left space-y-6">
-              <FadeIn y={20} delay={0.1} duration={0.6}>
-                <div className="inline-flex items-center gap-2 bg-[#1B3A6B]/10 text-[#1B3A6B] border border-[#1B3A6B]/20 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide">
-                  <Shield className="w-4 h-4 text-[#D94F2B]" />
-                  MKN Portal Hub — Web Portal Terpadu
-                </div>
-              </FadeIn>
-
-              <FadeIn y={30} delay={0.2} duration={0.7}>
-                <h1 className="hero-navy-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]">
-                  MKN PORTAL HUB
-                </h1>
-              </FadeIn>
-
-              <FadeIn y={30} delay={0.3} duration={0.7}>
-                <p className="text-base sm:text-lg text-[#718096] max-w-2xl font-normal leading-relaxed">
-                  Pusat akses resmi dan direktori web portal MKN. Temukan seluruh tautan platform operasional, sistem manajemen, direktori layanan, dan portal internal perusahaan dalam satu pintu.
-                </p>
-              </FadeIn>
-
-              {/* Corporate Stats Cards */}
-              <FadeIn y={30} delay={0.4} duration={0.7}>
-                <div className="grid grid-cols-2 gap-4 pt-2 max-w-md">
-                  <div className="bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-xs">
-                    <div className="flex items-center gap-2 text-[#2B6CB0] mb-1">
-                      <Building2 className="w-4 h-4" />
-                      <span className="text-xs font-bold text-[#718096]">Portal Terintegrasi</span>
-                    </div>
-                    <span className="text-2xl font-black text-[#1B3A6B]">{COMPANY_INFO.activePortals}</span>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-xs">
-                    <div className="flex items-center gap-2 text-[#D94F2B] mb-1">
-                      <Globe className="w-4 h-4" />
-                      <span className="text-xs font-bold text-[#718096]">Kategori Sistem</span>
-                    </div>
-                    <span className="text-2xl font-black text-[#1B3A6B]">{COMPANY_INFO.clientCount}</span>
-                  </div>
-                </div>
-              </FadeIn>
-
-              {/* CTA Buttons */}
-              <FadeIn y={30} delay={0.5} duration={0.7}>
-                <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <button
-                    onClick={() => onNavigate('gallery')}
-                    className="bg-[#D94F2B] hover:bg-[#E86547] text-white font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer text-sm"
-                  >
-                    <Sparkles className="w-5 h-5 text-yellow-300" />
-                    Jelajahi Portal Perusahaan
-                  </button>
-                </div>
-              </FadeIn>
+          {/* Search Bar */}
+          <FadeIn y={20} delay={0.2} duration={0.6} className="w-full max-w-2xl mb-16">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-white/40 group-focus-within:text-[#3B82F6] transition-colors" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari aplikasi atau layanan..."
+                className="w-full bg-[#1E293B]/60 backdrop-blur-md border border-white/10 rounded-full py-4 pl-12 pr-6 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/50 focus:border-[#3B82F6]/50 transition-all shadow-inner"
+              />
             </div>
+          </FadeIn>
 
-            {/* Right Column: Safely Bounded 3D Card */}
-            <div className="lg:col-span-5 relative flex justify-center pt-4 lg:pt-0">
-              <FadeIn y={40} delay={0.4} duration={0.8} className="w-full">
-                <Magnet
-                  padding={30}
-                  strength={1.5}
-                  activeTransition="transform 0.3s ease-out"
-                  inactiveTransition="transform 0.6s ease-in-out"
-                  className="w-full max-w-[360px] sm:max-w-[400px] mx-auto"
-                >
-                  <div
-                    className="relative mx-auto w-full cursor-pointer group"
-                    onClick={() => setIsVideoModalOpen(true)}
-                    title="Klik untuk memutar video MKN Onwards"
+          {/* Overlapping Cards Swiper */}
+          <div className="w-full relative mb-12">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-8 hide-scrollbar items-stretch px-4 md:px-8">
+              {filteredPortals.map((portal, idx) => {
+                // Determine theme index (use original index for consistent color if filtered, but we'll use mapped idx for simplicity)
+                const themeIdx = MARQUEE_PORTALS.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
+                const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
+
+                return (
+                  <FadeIn 
+                    key={portal.id} 
+                    y={30} 
+                    delay={0.05 * idx} 
+                    duration={0.5} 
+                    className="flex-shrink-0 snap-center w-[260px] sm:w-[280px] h-[360px]"
                   >
-                    {/* Decorative Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#1B3A6B] to-[#D94F2B] rounded-3xl blur-xl opacity-15 transform scale-95" />
-
-                    {/* Main Card Graphic */}
-                    <div className="relative bg-white/95 backdrop-blur-xl border border-[#E2E8F0] p-5 rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]">
-                      <div className="relative">
-                        <img
-                          src={DECORATIVE_IMAGES.gifOnward}
-                          alt="MKN Onwards Animation"
-                          className="w-full h-auto max-h-[280px] object-contain rounded-2xl"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 rounded-2xl flex items-center justify-center z-10">
-                          <div className="w-16 h-16 rounded-full bg-white/90 shadow-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <Play className="w-8 h-8 text-[#1B3A6B] fill-[#1B3A6B] ml-1" />
-                          </div>
+                    <a 
+                      href={portal.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`group relative flex flex-col justify-between w-full h-full rounded-2xl overflow-hidden border ${theme.border} ${theme.glow} transition-all duration-300 cursor-pointer`}
+                    >
+                      {/* Card Background Image & Gradients */}
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay group-hover:scale-105 transition-transform duration-700" 
+                        style={{ backgroundImage: `url(${portal.previewImage || portal.customImage || 'https://image.thum.io/get/width/1280/crop/800/noanimate/' + portal.url})` }}
+                      />
+                      <div className={`absolute inset-0 bg-gradient-to-b ${theme.from} ${theme.to} pointer-events-none`} />
+                      
+                      {/* Card Content */}
+                      <div className="relative z-10 flex flex-col items-center p-6 h-full text-center">
+                        {/* Icon Circle */}
+                        <div className={`w-16 h-16 rounded-full border border-white/20 flex items-center justify-center mb-6 bg-[#0B1120]/50 backdrop-blur-sm group-hover:scale-110 transition-transform duration-300`}>
+                          {getIconForPortal(themeIdx, theme.icon)}
                         </div>
-                      </div>
 
-                      <div className="mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-[#1B3A6B] to-[#D94F2B] border border-[#E2E8F0]">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[11px] font-extrabold text-white uppercase tracking-wider">
-                            MKN ONWARDS
-                          </span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/20 text-white backdrop-blur-sm">
-                            MOTION
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-white/90 leading-relaxed font-medium">
-                          Transformasi Digital menuju era baru kemitraan dan inovasi berkelanjutan.
+                        <h3 className="text-lg font-bold text-white mb-2 leading-tight">
+                          {portal.title}
+                        </h3>
+                        
+                        <p className="text-xs text-white/60 font-medium line-clamp-3 mb-6">
+                          {portal.description}
                         </p>
+
+                        <div className="mt-auto w-full">
+                           <div className={`w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs font-bold text-white ${theme.button} transition-colors border border-white/10`}>
+                             Akses Sekarang
+                             <ArrowRight className="w-3.5 h-3.5" />
+                           </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </Magnet>
-              </FadeIn>
+                    </a>
+                  </FadeIn>
+                );
+              })}
             </div>
           </div>
-        </div>
 
-        {/* Bottom Status Bar */}
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-[#718096] border-t border-[#E2E8F0]/80 z-10">
-          <span className="font-semibold text-[#1B3A6B]">
-            © 2026 MKN DIGITAL MOTION PORTAL. ALL RIGHTS RESERVED.
-          </span>
-          <span className="flex items-center gap-2 mt-2 sm:mt-0 font-medium text-[#D94F2B]">
-            <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
-            Interactive Motion Directory Ready
-          </span>
+          {/* Bottom Button */}
+          <FadeIn y={20} delay={0.6} duration={0.6}>
+            <button 
+              onClick={() => onNavigate('gallery')}
+              className="bg-[#1E293B]/80 hover:bg-[#1E293B] border border-white/10 backdrop-blur-md text-white/90 text-sm font-semibold px-6 py-3 rounded-full transition-all shadow-lg flex items-center gap-2 cursor-pointer"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span>Lihat Semua Aplikasi</span>
+            </button>
+          </FadeIn>
+          
         </div>
       </section>
 
-      {/* 3D Intro Video Modal */}
       <LogoIntroModal isOpen={isIntroOpen} onClose={() => setIsIntroOpen(false)} />
-
-      {/* Onwards Video Modal */}
-      <VideoModal
-        isOpen={isVideoModalOpen}
-        onClose={() => setIsVideoModalOpen(false)}
-        videoUrl={DECORATIVE_IMAGES.videoOnward}
-        title="MKN Onwards"
-      />
     </div>
   );
 };
+
 
