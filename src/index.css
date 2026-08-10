@@ -156,13 +156,13 @@
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-33.33%);
   }
 }
 
 @keyframes marqueeLeft {
   0% {
-    transform: translateX(-50%);
+    transform: translateX(-33.33%);
   }
   100% {
     transform: translateX(0);
@@ -170,11 +170,271 @@
 }
 
 .animate-marquee-right {
-  animation: marqueeRight 40s linear infinite;
+  animation: marqueeRight 50s linear infinite;
 }
 
 .animate-marquee-left {
-  animation: marqueeLeft 40s linear infinite;
+  animation: marqueeLeft 50s linear infinite;
+}
+
+/* Enhanced smooth scrolling */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced card animations */
+@keyframes cardHover {
+  0% {
+    transform: translateY(0) scale(1) rotateY(0deg);
+  }
+  100% {
+    transform: translateY(-8px) scale(1.02) rotateY(2deg);
+  }
+}
+
+@keyframes cardGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px -2px rgba(27, 58, 107, 0.1), 0 0 0 rgba(43, 108, 176, 0);
+  }
+  50% {
+    box-shadow: 0 8px 40px -4px rgba(27, 58, 107, 0.2), 0 0 20px rgba(43, 108, 176, 0.1);
+  }
+}
+
+/* Smooth spring animation for carousel navigation */
+@keyframes springBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-spring-bounce {
+  animation: springBounce 0.3s ease-out;
+}
+
+/* Enhanced transition utilities */
+.transition-smooth {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-spring {
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Enhanced carousel and swipe animations */
+@keyframes smoothSlide {
+  0% {
+    transform: translateX(-2px);
+    opacity: 0.95;
+  }
+  50% {
+    transform: translateX(2px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes portalPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+  }
+}
+
+@keyframes indicatorGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+  }
+}
+
+.animate-smooth-slide {
+  animation: smoothSlide 0.4s ease-out;
+}
+
+.animate-portal-pulse {
+  animation: portalPulse 2s ease-in-out infinite;
+}
+
+.animate-indicator-glow {
+  animation: indicatorGlow 1.5s ease-in-out infinite;
+}
+
+/* Enhance existing animations */
+.transition-bounce {
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Smooth scroll with momentum */
+.scroll-smooth-enhanced {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Card interaction enhancements */
+.card-hover-3d {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.card-hover-3d:hover {
+  transform: perspective(1000px) rotateY(5deg) rotateX(2deg) translateZ(20px);
+}
+
+/* Enhanced carousel layout with better spacing */
+.carousel-enhanced {
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+}
+
+.carousel-track-enhanced {
+  padding-left: 3rem;
+  padding-right: 3rem;
+  scroll-padding: 3rem;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+@media (min-width: 640px) {
+  .carousel-track-enhanced {
+    padding-left: 4rem;
+    padding-right: 4rem;
+    scroll-padding: 4rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .carousel-track-enhanced {
+    padding-left: 5rem;
+    padding-right: 5rem;
+    scroll-padding: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .carousel-track-enhanced {
+    padding-left: 6rem;
+    padding-right: 6rem;
+    scroll-padding: 6rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .carousel-track-enhanced {
+    padding-left: 8rem;
+    padding-right: 8rem;
+    scroll-padding: 8rem;
+  }
+}
+
+/* Navigation arrow positioning with proper clearance */
+.nav-arrow-enhanced-left {
+  left: -1rem;
+}
+
+.nav-arrow-enhanced-right {
+  right: -1rem;
+}
+
+@media (min-width: 640px) {
+  .nav-arrow-enhanced-left {
+    left: -2rem;
+  }
+  
+  .nav-arrow-enhanced-right {
+    right: -2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .nav-arrow-enhanced-left {
+    left: -3rem;
+  }
+  
+  .nav-arrow-enhanced-right {
+    right: -3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-arrow-enhanced-left {
+    left: -4rem;
+  }
+  
+  .nav-arrow-enhanced-right {
+    right: -4rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .nav-arrow-enhanced-left {
+    left: -6rem;
+  }
+  
+  .nav-arrow-enhanced-right {
+    right: -6rem;
+  }
+}
+
+/* Enhanced carousel smooth scrolling */
+.carousel-smooth {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.carousel-smooth::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure portal items are fully visible and clickable */
+.portal-item-enhanced {
+  position: relative;
+  z-index: 25;
+  pointer-events: auto;
+  margin: 0 1rem;
+  flex-shrink: 0;
+}
+
+.portal-item-enhanced:first-child {
+  margin-left: 0;
+}
+
+.portal-item-enhanced:last-child {
+  margin-right: 0;
+}
+
+/* Enhanced snap positioning */
+.carousel-snap-enhanced {
+  scroll-snap-align: center;
+  scroll-margin: 2rem;
+}
+
+/* GPU acceleration for all animations */
+.transform-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .will-change-transform {
