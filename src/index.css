@@ -305,92 +305,8 @@
 }
 
 .carousel-track-enhanced {
-  padding-left: 3rem;
-  padding-right: 3rem;
-  scroll-padding: 3rem;
   overflow-x: auto;
   overflow-y: visible;
-}
-
-@media (min-width: 640px) {
-  .carousel-track-enhanced {
-    padding-left: 4rem;
-    padding-right: 4rem;
-    scroll-padding: 4rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .carousel-track-enhanced {
-    padding-left: 5rem;
-    padding-right: 5rem;
-    scroll-padding: 5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .carousel-track-enhanced {
-    padding-left: 6rem;
-    padding-right: 6rem;
-    scroll-padding: 6rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .carousel-track-enhanced {
-    padding-left: 8rem;
-    padding-right: 8rem;
-    scroll-padding: 8rem;
-  }
-}
-
-/* Navigation arrow positioning with proper clearance */
-.nav-arrow-enhanced-left {
-  left: -1rem;
-}
-
-.nav-arrow-enhanced-right {
-  right: -1rem;
-}
-
-@media (min-width: 640px) {
-  .nav-arrow-enhanced-left {
-    left: -2rem;
-  }
-  
-  .nav-arrow-enhanced-right {
-    right: -2rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .nav-arrow-enhanced-left {
-    left: -3rem;
-  }
-  
-  .nav-arrow-enhanced-right {
-    right: -3rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .nav-arrow-enhanced-left {
-    left: -4rem;
-  }
-  
-  .nav-arrow-enhanced-right {
-    right: -4rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .nav-arrow-enhanced-left {
-    left: -6rem;
-  }
-  
-  .nav-arrow-enhanced-right {
-    right: -6rem;
-  }
 }
 
 /* Enhanced carousel smooth scrolling */
@@ -412,16 +328,7 @@
   position: relative;
   z-index: 25;
   pointer-events: auto;
-  margin: 0 1rem;
   flex-shrink: 0;
-}
-
-.portal-item-enhanced:first-child {
-  margin-left: 0;
-}
-
-.portal-item-enhanced:last-child {
-  margin-right: 0;
 }
 
 /* Enhanced snap positioning */

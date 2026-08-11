@@ -129,14 +129,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
     if (direction === 'left' && currentItemIndex === 0) {
       currentItemIndex = cycleLength;
       alignItemToStart(el, items[currentItemIndex], 'auto');
-    }
-    if (direction === 'right' && currentItemIndex === items.length - 1) {
+    } else if (direction === 'right' && currentItemIndex === items.length - 1) {
       currentItemIndex = items.length - cycleLength - 1;
       alignItemToStart(el, items[currentItemIndex], 'auto');
     }
 
-    const targetItemIndex = currentItemIndex + (direction === 'left' ? -1 : 1);
-    alignItemToStart(el, items[targetItemIndex]);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const targetItemIndex = currentItemIndex + (direction === 'left' ? -1 : 1);
+        alignItemToStart(el, items[targetItemIndex]);
+      });
+    });
   };
 
   const goToSlide = (index: number) => {
@@ -295,7 +298,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
               onClick={() => scrollCarousel('left')}
               aria-label="Geser daftar aplikasi ke kiri"
               title="Geser ke kiri"
-              className="absolute -left-2 sm:-left-4 md:-left-6 lg:-left-8 xl:-left-12 2xl:-left-16 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B1120]/95 backdrop-blur-md border-2 border-[#3B82F6]/50 text-white flex items-center justify-center transition-all duration-300 hover:bg-[#3B82F6] hover:border-[#3B82F6] hover:scale-110 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer shadow-xl shadow-black/30"
+              className="absolute left-0 sm:left-2 lg:left-4 xl:-left-6 2xl:-left-10 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B1120]/95 backdrop-blur-md border-2 border-[#3B82F6]/50 text-white flex items-center justify-center transition-all duration-300 hover:bg-[#3B82F6] hover:border-[#3B82F6] hover:scale-110 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer shadow-xl shadow-black/30"
             >
               <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
             </button>
@@ -339,7 +342,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
               onClick={() => scrollCarousel('right')}
               aria-label="Geser daftar aplikasi ke kanan"
               title="Geser ke kanan"
-              className="absolute -right-2 sm:-right-4 md:-right-6 lg:-right-8 xl:-right-12 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B1120]/95 backdrop-blur-md border-2 border-[#3B82F6]/50 text-white flex items-center justify-center transition-all duration-300 hover:bg-[#3B82F6] hover:border-[#3B82F6] hover:scale-110 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer shadow-xl shadow-black/30"
+              className="absolute right-0 sm:right-2 lg:right-4 xl:-right-6 2xl:-right-10 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B1120]/95 backdrop-blur-md border-2 border-[#3B82F6]/50 text-white flex items-center justify-center transition-all duration-300 hover:bg-[#3B82F6] hover:border-[#3B82F6] hover:scale-110 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer shadow-xl shadow-black/30"
             >
               <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
             </button>
