@@ -1,34 +1,13 @@
 import React from 'react';
 import { FadeIn } from './ui/FadeIn';
 import { AnimatedText } from './ui/AnimatedText';
-import { DECORATIVE_IMAGES, COMPANY_INFO } from '../data/portalData';
-import { Building2, Award, Users, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import { Building2, Award, Users, CheckCircle2 } from 'lucide-react';
 
-interface AboutSectionProps {
-  onOpenContact: () => void;
-}
-
-export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => {
+export const AboutSection: React.FC = () => {
   const companyDescription = "MKN Portal Hub adalah direktori portal perusahaan terpadu yang dirancang untuk memudahkan navigasi, akses sistem operasional, pemantauan analitik, dan pengelolaan ekosistem digital perusahaan dalam satu lokasi terpusat.";
 
   return (
     <section id="overview" className="relative py-24 sm:py-32 bg-[#F7F8FA] border-b border-[#E2E8F0] overflow-hidden">
-      {/* Decorative Floating Assets */}
-      <div className="absolute top-[8%] left-[2%] z-10 pointer-events-none opacity-20 hidden md:block">
-        <img
-          src={DECORATIVE_IMAGES.moonIcon}
-          alt="Decorative Accent"
-          className="w-[160px] h-auto object-contain"
-        />
-      </div>
-      <div className="absolute bottom-[8%] right-[2%] z-10 pointer-events-none opacity-20 hidden md:block">
-        <img
-          src={DECORATIVE_IMAGES.legoIcon}
-          alt="Decorative Accent"
-          className="w-[160px] h-auto object-contain"
-        />
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-20">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
@@ -52,8 +31,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
           </div>
         </div>
 
-        {/* 4 Pillar Value Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* 3 Pillar Value Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <FadeIn y={30} delay={0.2} duration={0.6}>
             <div className="bg-white p-7 rounded-2xl border border-[#E2E8F0] shadow-sm hover:shadow-md transition-shadow h-full flex flex-col justify-between">
               <div>
@@ -105,28 +84,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
                 <span>SSO Enforced</span>
                 <CheckCircle2 className="w-4 h-4 text-[#059669]" />
               </div>
-            </div>
-          </FadeIn>
-
-          <FadeIn y={30} delay={0.5} duration={0.6}>
-            <div className="bg-gradient-to-br from-[#1B3A6B] to-[#12284C] text-white p-7 rounded-2xl shadow-lg h-full flex flex-col justify-between">
-              <div>
-                <span className="px-2.5 py-1 rounded text-[10px] font-bold bg-[#D94F2B] text-white uppercase tracking-wider inline-block mb-4">
-                  Ekosistem Digital
-                </span>
-                <h3 className="text-xl font-extrabold text-white mb-2">MKN Portal Suite</h3>
-                <p className="text-xs text-[#E2E8F0] leading-relaxed">
-                  Menyediakan ekosistem portal web resmi yang aman, terstruktur, dan siap digunakan kapan saja.
-                </p>
-              </div>
-
-              <button
-                onClick={onOpenContact}
-                className="mt-6 bg-[#D94F2B] hover:bg-[#E86547] text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer"
-              >
-                <span>Bantuan Akses Portal</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
             </div>
           </FadeIn>
         </div>

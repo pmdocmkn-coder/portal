@@ -20,7 +20,7 @@ export const SitePreviewModal: React.FC<SitePreviewModalProps> = ({ site, onClos
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const liveScreenshotUrl = site.customImage || site.previewImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${site.url}`;
+  const liveScreenshotUrl = site.customImage || site.previewImage || `https://s0.wp.com/mshots/v1/${encodeURIComponent(site.url)}?w=800`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-md animate-fadeIn">

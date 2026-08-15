@@ -1,151 +1,130 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { FadeIn } from './ui/FadeIn';
-import { MKNLogo } from './ui/MKNLogo';
+import { ArrowRight, Search, Code2, LayoutGrid, ChevronLeft, ChevronRight, Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv } from 'lucide-react';
 import { LogoIntroModal } from './ui/LogoIntroModal';
-import { COMPANY_INFO, MARQUEE_PORTALS, DECORATIVE_IMAGES } from '../data/portalData';
-import { ArrowRight, Play, Search, LayoutGrid, Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FadeIn } from './ui/FadeIn';
+import { MARQUEE_PORTALS, MarqueeItem } from '../data/portalData';
+
+const getIconForPortal = (index: number, className: string = "") => {
+  const icons = [Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv];
+  const Icon = icons[index % icons.length];
+  return <Icon className={className} />;
+};
 
 interface HeroSectionProps {
   onOpenContact: () => void;
-  onNavigate: (sectionId: string) => void;
+  onNavigate: (page: 'overview' | 'gallery' | 'projects') => void;
 }
 
+// LIGHT THEME COLORS based on Synergy MKN Logo (Coral, Cyan, Deep Blue)
 const CARD_THEMES = [
-  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-blue-500/40', ringHover: 'hover:ring-[#3B82F6]/80', glow: 'hover:shadow-[0_0_35px_rgba(59,130,246,0.35),0_0_70px_rgba(59,130,246,0.45)]', button: 'bg-[#1e3a8a] hover:bg-blue-600', img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600' },
-  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-emerald-500/40', ringHover: 'hover:ring-[#10B981]/80', glow: 'hover:shadow-[0_0_35px_rgba(16,185,129,0.35),0_0_70px_rgba(16,185,129,0.45)]', button: 'bg-[#064e3b] hover:bg-emerald-600', img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600' },
-  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-amber-500/40', ringHover: 'hover:ring-[#F59E0B]/80', glow: 'hover:shadow-[0_0_35px_rgba(245,158,11,0.35),0_0_70px_rgba(245,158,11,0.45)]', button: 'bg-[#78350f] hover:bg-amber-600', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600' },
-  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-purple-500/40', ringHover: 'hover:ring-[#8B5CF6]/80', glow: 'hover:shadow-[0_0_35px_rgba(139,92,246,0.35),0_0_70px_rgba(139,92,246,0.45)]', button: 'bg-[#4c1d95] hover:bg-purple-600', img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600' },
-  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-teal-500/40', ringHover: 'hover:ring-[#14B8A6]/80', glow: 'hover:shadow-[0_0_35px_rgba(20,184,166,0.35),0_0_70px_rgba(20,184,166,0.45)]', button: 'bg-[#134e4a] hover:bg-teal-600', img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600' },
-  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-slate-500/40', ringHover: 'hover:ring-[#94A3B8]/80', glow: 'hover:shadow-[0_0_35px_rgba(148,163,184,0.35),0_0_70px_rgba(148,163,184,0.45)]', button: 'bg-[#1e293b] hover:bg-slate-600', img: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=600' },
-  { from: 'from-[#0B1120]/10', to: 'to-[#0B1120]', border: 'border-cyan-500/40', ringHover: 'hover:ring-[#06B6D4]/80', glow: 'hover:shadow-[0_0_35px_rgba(6,182,212,0.35),0_0_70px_rgba(6,182,212,0.45)]', button: 'bg-[#164e63] hover:bg-cyan-600', img: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=600' },
+  { // Coral
+    outerRing: 'ring-[#E85D44]/20',
+    innerRing: 'bg-[#E85D44]/10 text-[#E85D44]',
+    btnBg: 'bg-[#E85D44]/10',
+    btnHover: 'group-hover:bg-[#E85D44] group-hover:text-white',
+    btnText: 'text-[#E85D44]'
+  },
+  { // Cyan
+    outerRing: 'ring-[#38BDF8]/20',
+    innerRing: 'bg-[#38BDF8]/10 text-[#38BDF8]',
+    btnBg: 'bg-[#38BDF8]/10',
+    btnHover: 'group-hover:bg-[#38BDF8] group-hover:text-white',
+    btnText: 'text-[#38BDF8]'
+  },
+  { // Deep Blue
+    outerRing: 'ring-[#1E3A8A]/20',
+    innerRing: 'bg-[#1E3A8A]/10 text-[#1E3A8A]',
+    btnBg: 'bg-[#1E3A8A]/10',
+    btnHover: 'group-hover:bg-[#1E3A8A] group-hover:text-white',
+    btnText: 'text-[#1E3A8A]'
+  },
+  { // Soft Emerald
+    outerRing: 'ring-emerald-500/20',
+    innerRing: 'bg-emerald-500/10 text-emerald-600',
+    btnBg: 'bg-emerald-500/10',
+    btnHover: 'group-hover:bg-emerald-500 group-hover:text-white',
+    btnText: 'text-emerald-600'
+  },
+  { // Purple
+    outerRing: 'ring-purple-500/20',
+    innerRing: 'bg-purple-500/10 text-purple-600',
+    btnBg: 'bg-purple-500/10',
+    btnHover: 'group-hover:bg-purple-500 group-hover:text-white',
+    btnText: 'text-purple-600'
+  },
 ];
 
-const getIconForPortal = (index: number, className: string) => {
-  const icons = [Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv];
-  const Icon = icons[index % icons.length];
-  return <Icon className={className} strokeWidth={1.5} />;
-};
-
-interface PortalAppItemProps {
-  portal: (typeof MARQUEE_PORTALS)[number];
-  theme: (typeof CARD_THEMES)[number];
-  themeIdx: number;
-}
-
-const PortalAppItem: React.FC<PortalAppItemProps> = ({ portal, theme, themeIdx }) => {
-  const labelRef = useRef<HTMLHeadingElement>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-
-  useEffect(() => {
-    const el = labelRef.current;
-    if (!el) return;
-    const check = () => setIsOverflowing(el.scrollHeight > el.clientHeight + 1);
-    check();
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(check).catch(() => { });
-    }
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, [portal.title]);
-
+const PortalAppItem = ({ portal, theme, themeIdx }: { key?: string | number, portal: MarqueeItem, theme: typeof CARD_THEMES[0], themeIdx: number }) => {
   return (
-    <div className="group flex-shrink-0 snap-center flex flex-col items-center gap-3 relative z-20 pointer-events-auto">
-      <div className="relative z-20">
-        {/* Tooltip: full title when the 2-line label is truncated */}
-        {isOverflowing && (
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-[60] w-max max-w-[240px] px-3 py-1.5 rounded-lg bg-[#1E293B]/95 border border-white/10 text-white/95 text-xs font-semibold text-center leading-snug shadow-2xl backdrop-blur-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
-            {portal.title}
+    <a
+      href={portal.url}
+      className="group flex-none w-[280px] md:w-[320px] h-[280px] snap-center outline-none"
+    >
+      {/* DOUBLE-BEZEL OUTER SHELL */}
+      <div className="w-full h-full rounded-[2rem] bg-slate-900/5 p-2 ring-1 ring-slate-900/5 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-slate-900/10 group-active:scale-[0.98] cursor-pointer">
+        {/* DOUBLE-BEZEL INNER CORE */}
+        <div className="relative w-full h-full rounded-[calc(2rem-0.5rem)] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col items-center p-8 text-center transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)]">
+          
+          {/* Logo or Icon */}
+          <div className="mb-6 h-20 w-full shrink-0 flex items-center justify-center transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-1">
+            {portal.customIcon ? (
+              <img src={portal.customIcon} alt={`${portal.title} Icon`} className="h-full w-auto object-contain max-w-[200px] drop-shadow-sm" />
+            ) : (
+              <div className={`w-16 h-16 shrink-0 rounded-3xl ring-1 ${theme.outerRing} ${theme.innerRing} flex items-center justify-center bg-white shadow-sm`}>
+                {getIconForPortal(themeIdx, `w-8 h-8`)}
+              </div>
+            )}
           </div>
-        )}
-
-        <a
-          href={portal.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`relative flex flex-col items-center justify-center w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-[3px] ${theme.border} ${theme.glow} shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-500 hover:-translate-y-3 hover:scale-110 hover:z-30 cursor-pointer ring-4 ring-[#0B1120] ${theme.ringHover} transform-gpu group-hover:animate-spring-bounce z-20`}
-        >
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-50 mix-blend-overlay group-hover:scale-125 group-hover:opacity-80 transition-all duration-700 transform-gpu"
-            style={{ backgroundImage: `url(${portal.previewImage || portal.customImage || 'https://image.thum.io/get/width/1280/crop/800/noanimate/' + portal.url})` }}
-          />
-          {/* Gradients */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${theme.from} ${theme.to} pointer-events-none transition-opacity duration-500 group-hover:opacity-90`} />
-
-          {/* Icon - uniform white line-art style */}
-          <div className="relative z-10 flex items-center justify-center group-hover:scale-125 group-hover:drop-shadow-[0_0_18px_rgba(255,255,255,0.5)] transition-all duration-500">
-            {getIconForPortal(themeIdx, 'text-white w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 drop-shadow-lg transition-all duration-300')}
+          
+          {/* Title */}
+          <div className="h-14 w-full shrink-0 flex items-start justify-center mb-2">
+            <h3 className="text-slate-900 font-bold text-xl leading-tight line-clamp-2">
+              {portal.title}
+            </h3>
           </div>
-        </a>
+
+          {/* Spacer to push button to bottom */}
+          <div className="mt-auto w-full">
+            {/* BUTTON-IN-BUTTON CTA */}
+            <div className={`w-full py-2 pl-6 pr-2 rounded-full ${theme.btnBg} ${theme.btnText} ${theme.btnHover} text-sm font-semibold flex items-center justify-between transition-colors duration-500`}>
+              <span>Akses Sekarang</span>
+              <div className="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:bg-white group-hover:text-black group-hover:translate-x-1 shadow-sm">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
+          </div>
+          
+        </div>
       </div>
-
-      {/* Portal Name — max 2 lines, proper word-wrap, width matches icon */}
-      <h3
-        ref={labelRef}
-        className="w-24 sm:w-28 md:w-32 text-xs sm:text-sm md:text-base font-bold text-white/80 text-center leading-snug group-hover:text-white group-hover:scale-105 transition-all duration-300 px-1 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden break-words"
-      >
-        {portal.title}
-      </h3>
-    </div>
+    </a>
   );
 };
+
+import img1 from '../assets/images/Hero/1.jpeg';
+import img2 from '../assets/images/Hero/2.jpeg';
+import img3 from '../assets/images/Hero/3.jpeg';
+import img4 from '../assets/images/Hero/4.jpeg';
+import img5 from '../assets/images/Hero/5.jpeg';
+import img6 from '../assets/images/Hero/6.jpeg';
+import img7 from '../assets/images/Hero/7.jpeg';
+import img8 from '../assets/images/Hero/8.jpeg';
+import img9 from '../assets/images/Hero/9.jpeg';
+import img10 from '../assets/images/Hero/10.jpeg';
+
+const HERO_IMAGES = [img1, img2, img3, img4, img5, img6, img7, img8, img9, img10];
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavigate }) => {
   const [isIntroOpen, setIsIntroOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showSwipeHint, setShowSwipeHint] = useState(true);
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const [bgImageIdx, setBgImageIdx] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const getCarouselItems = (el: HTMLDivElement) =>
-    Array.from(el.querySelectorAll<HTMLElement>('[data-carousel-item]'));
-
-  const alignItemToStart = (el: HTMLDivElement, item: HTMLElement, behavior: ScrollBehavior = 'smooth') => {
-    const leftPadding = Number.parseFloat(getComputedStyle(el).paddingLeft);
-    el.scrollTo({
-      left: item.offsetLeft - leftPadding,
-      behavior,
-    });
-  };
-
-  const getClosestItemIndex = (el: HTMLDivElement, items: HTMLElement[]) => {
-    const viewportStart = el.scrollLeft + Number.parseFloat(getComputedStyle(el).paddingLeft);
-    return items.reduce((closestIndex, item, index) => {
-      const closestDistance = Math.abs(items[closestIndex].offsetLeft - viewportStart);
-      const distance = Math.abs(item.offsetLeft - viewportStart);
-      return distance < closestDistance ? index : closestIndex;
-    }, 0);
-  };
-
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    const el = carouselRef.current;
-    if (!el || filteredPortals.length === 0) return;
-
-    const items = getCarouselItems(el);
-    let currentItemIndex = getClosestItemIndex(el, items);
-    const cycleLength = filteredPortals.length;
-
-    // Reposition to an equivalent copy before either edge, then animate one card only.
-    if (direction === 'left' && currentItemIndex === 0) {
-      currentItemIndex = cycleLength;
-      alignItemToStart(el, items[currentItemIndex], 'auto');
-    }
-    if (direction === 'right' && currentItemIndex === items.length - 1) {
-      currentItemIndex = items.length - cycleLength - 1;
-      alignItemToStart(el, items[currentItemIndex], 'auto');
-    }
-
-    const targetItemIndex = currentItemIndex + (direction === 'left' ? -1 : 1);
-    alignItemToStart(el, items[targetItemIndex]);
-  };
-
-  const goToSlide = (index: number) => {
-    const el = carouselRef.current;
-    if (!el) return;
-    const item = el.querySelector<HTMLElement>(`[data-carousel-item="${filteredPortals.length + index}"]`);
-    if (!item) return;
-    alignItemToStart(el, item);
-  };
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBgImageIdx((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   const filteredPortals = useMemo(() => {
     if (!searchQuery) return MARQUEE_PORTALS;
@@ -156,227 +135,148 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
     );
   }, [searchQuery]);
 
-  // Initialize carousel to middle section for infinite loop
-  useEffect(() => {
-    const el = carouselRef.current;
-    if (!el || filteredPortals.length === 0) return;
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -340, behavior: 'smooth' });
+    }
+  };
 
-    // Use the actual rendered item position so the loop remains accurate at every breakpoint.
-    const initialPosition = () => {
-      const middleCopy = el.querySelector<HTMLElement>(`[data-carousel-item="${filteredPortals.length}"]`);
-      if (middleCopy) alignItemToStart(el, middleCopy, 'auto');
-    };
-    const frame = requestAnimationFrame(initialPosition);
-
-    // Hide swipe hint after 5 seconds
-    const timer = setTimeout(() => setShowSwipeHint(false), 5000);
-    return () => {
-      cancelAnimationFrame(frame);
-      clearTimeout(timer);
-    };
-  }, [filteredPortals.length]);
-
-  // Track scroll position for indicator dots
-  useEffect(() => {
-    const el = carouselRef.current;
-    if (!el) return;
-
-    const handleScroll = () => {
-      const items = getCarouselItems(el);
-      if (!items.length) return;
-      const itemIndex = getClosestItemIndex(el, items);
-      setCurrentIndex(itemIndex % filteredPortals.length);
-    };
-
-    el.addEventListener('scroll', handleScroll);
-    return () => el.removeEventListener('scroll', handleScroll);
-  }, [filteredPortals.length]);
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 340, behavior: 'smooth' });
+    }
+  };
 
   return (
-    <div className="relative bg-[#0B1120] min-h-screen text-white font-sans selection:bg-[#3B82F6] selection:text-white">
-      {/* Background Image & Overlay */}
-      <div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity"
-        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop")' }}
-      />
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0B1120]/80 via-[#0B1120]/60 to-[#0B1120] pointer-events-none" />
+    <div className="relative bg-[#F8FAFC] min-h-screen text-slate-900 font-sans selection:bg-[#3B82F6] selection:text-white flex flex-col overflow-hidden">
+      
+      {/* Background Image Slider */}
+      {HERO_IMAGES.map((img, idx) => (
+        <div 
+          key={img}
+          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${idx === bgImageIdx ? 'opacity-100' : 'opacity-0'} pointer-events-none`}
+          style={{ backgroundImage: `url(${img})` }}
+        />
+      ))}
+      
+      {/* Bright Theme Wash Overlay */}
+      <div className="absolute inset-0 bg-white/50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#F8FAFC] via-transparent to-transparent pointer-events-none" />
 
-      {/* STICKY TOP NAVBAR (Dark Theme) */}
-      <header className="sticky top-0 z-50 w-full bg-[#0B1120]/80 backdrop-blur-xl border-b border-white/10 shadow-lg transition-all">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-3.5 flex items-center justify-between gap-4">
-          <div className="cursor-pointer flex items-center gap-2" onClick={() => setIsIntroOpen(true)} title="Klik untuk putar 3D Intro Motion Logo">
-            {/* Using standard text for logo to match minimal dark theme */}
-            <div className="font-black text-xl tracking-tight text-white flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-gradient-to-br from-[#3B82F6] to-[#1D4ED8] flex items-center justify-center">
-                <span className="text-white text-xs font-bold">MKN</span>
-              </div>
-              <span>PORTAL HUB</span>
-            </div>
+      {/* Background Ambient Lights */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#E85D44]/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#38BDF8]/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[20%] w-[60%] h-[50%] rounded-full bg-[#1E3A8A]/5 blur-[120px] pointer-events-none" />
+
+      {/* HEADER */}
+      <header className="relative z-50 w-full border-b border-slate-200 bg-white/70 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
+          <div className="cursor-pointer flex items-center gap-3" onClick={() => setIsIntroOpen(true)} title="Klik untuk putar 3D Intro Motion Logo">
+            <img src="/src/assets/images/logo_mkn.png" alt="MKN Logo" className="h-8 object-contain" />
+            <span className="font-bold text-lg tracking-tight text-slate-900">PORTAL</span>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-1.5 bg-white/5 p-1.5 rounded-full border border-white/10 shadow-inner">
-            <button
-              onClick={() => onNavigate('gallery')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-white bg-white/10 border border-white/5 shadow-xs hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Direktori Portal Live
-            </button>
-            <button
-              onClick={() => onNavigate('overview')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-            >
-              Tentang MKN
-            </button>
-            <button
-              onClick={() => onNavigate('projects')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-            >
-              Portal Utama
-            </button>
+          <nav className="hidden lg:flex items-center gap-8">
+            <button onClick={() => onNavigate('gallery')} className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">Direktori Portal</button>
+            <button onClick={() => onNavigate('overview')} className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">Tentang MKN</button>
+            <button onClick={() => onNavigate('projects')} className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">Portal Utama</button>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onOpenContact}
-              className="bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-            >
-              <span>Hubungi Kami</span>
-            </button>
-          </div>
+          <button onClick={onOpenContact} className="bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all cursor-pointer shadow-md hover:shadow-lg">
+            Hubungi Kami
+          </button>
         </div>
       </header>
 
-      {/* MAIN HERO CONTENT */}
-      <section className="relative z-10 flex flex-col items-center justify-start pt-16 pb-24 text-center min-h-[calc(100vh-76px)]">
-        <div className="w-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col items-center">
-
-          <FadeIn y={20} delay={0.1} duration={0.6}>
-            <p className="text-white/80 text-sm md:text-base font-medium tracking-wide mb-2">
-              Selamat Datang di
-            </p>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight mb-4 flex items-center justify-center gap-3">
-              <span className="text-[#3B82F6] drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]">MKN</span>
-              <span className="text-white">PORTAL</span>
-            </h1>
-            <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto mb-10 font-medium">
-              Satu portal untuk semua sistem. Pilih layanan yang ingin Anda akses.
-            </p>
+      {/* MAIN CONTENT */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center pt-8 pb-12 text-center w-full">
+        <div className="w-full flex flex-col items-center">
+          
+          {/* Typography */}
+          <FadeIn y={30} delay={0.1} duration={0.8}>
+            <div className="px-4">
+              <span className="inline-block rounded-full bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 px-5 py-2 text-[11px] uppercase tracking-[0.2em] font-bold text-slate-700 mb-4">
+                Eksplorasi Layanan
+              </span>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-4 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] leading-[1.2]">
+                <span className="text-slate-900 drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]">Sinergi</span>
+                <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#1D4ED8] via-[#3B82F6] to-[#E85D44] pb-4 pt-1 drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]">Terintegrasi</span>
+              </h1>
+              <p className="text-lg md:text-xl text-slate-700 max-w-2xl mx-auto mb-8 leading-relaxed font-semibold drop-shadow-[0_0_10px_rgba(255,255,255,1)]">
+                Satu portal cerdas untuk seluruh sistem operasional dan manajemen Anda.
+              </p>
+            </div>
           </FadeIn>
 
           {/* Search Bar */}
-          <FadeIn y={20} delay={0.2} duration={0.6} className="w-full max-w-2xl mb-16">
+          <FadeIn y={30} delay={0.2} duration={0.8} className="w-full max-w-2xl px-4 mb-8">
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-white/40 group-focus-within:text-[#3B82F6] transition-colors" />
+              <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-slate-400 group-focus-within:text-[#3B82F6] transition-colors" />
               </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari aplikasi atau layanan..."
-                className="w-full bg-white/10 backdrop-blur-lg border-2 border-[#3B82F6]/30 rounded-full py-4 pl-12 pr-6 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/60 focus:border-[#3B82F6] focus:bg-white/15 transition-all shadow-lg shadow-black/20"
+                className="w-full bg-white border border-slate-200 rounded-full py-4 pl-16 pr-6 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/20 focus:border-[#3B82F6] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] text-base font-medium"
               />
             </div>
           </FadeIn>
 
-          {/* Portal Directory: enhanced layout with proper spacing */}
-          <div className="relative w-full mx-auto mb-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-            
-            {/* Swipe Hint - positioned higher and more spaced */}
-            {showSwipeHint && (
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-white/10 backdrop-blur-sm px-5 py-3 rounded-full border border-white/20 text-white/80 text-sm font-medium animate-pulse shadow-lg">
-                <span>← Geser atau gunakan panah →</span>
+          {/* Carousel Section */}
+          <FadeIn y={40} delay={0.3} duration={1} className="w-full relative">
+            {filteredPortals.length > 0 ? (
+              <div className="w-full relative group/carousel">
+                {/* Carousel Container */}
+                <div 
+                  ref={scrollContainerRef}
+                  className="flex flex-row overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar px-6 md:px-24 py-8 gap-6 items-stretch w-full"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {filteredPortals.map((portal, idx) => {
+                    const themeIdx = MARQUEE_PORTALS.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
+                    const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
+                    return (
+                      <PortalAppItem key={`${portal.id}-${idx}`} portal={portal} theme={theme} themeIdx={themeIdx} />
+                    );
+                  })}
+                </div>
+
+                {/* Left/Right Navigation Arrows */}
+                <button 
+                  onClick={scrollLeft}
+                  className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center justify-center text-slate-600 hover:text-slate-900 hover:scale-105 transition-all duration-500 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0 focus:opacity-100 pointer-events-auto z-20"
+                >
+                  <ChevronLeft className="w-6 h-6 ml-[-2px]" />
+                </button>
+                <button 
+                  onClick={scrollRight}
+                  className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center justify-center text-slate-600 hover:text-slate-900 hover:scale-105 transition-all duration-500 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0 focus:opacity-100 pointer-events-auto z-20"
+                >
+                  <ChevronRight className="w-6 h-6 mr-[-2px]" />
+                </button>
+                
+                {/* Gradient Masks removed to preserve background visibility */}
+              </div>
+            ) : (
+              <div className="py-24 text-center bg-white rounded-3xl border border-slate-200 shadow-sm w-full max-w-2xl mx-auto px-6">
+                <p className="text-slate-500 text-lg font-medium">Tidak ada aplikasi yang sesuai dengan "{searchQuery}"</p>
               </div>
             )}
-
-            {/* Left Navigation Arrow - positioned outside with more distance */}
-            <button
-              onClick={() => scrollCarousel('left')}
-              aria-label="Geser daftar aplikasi ke kiri"
-              title="Geser ke kiri"
-              className="absolute -left-2 sm:-left-4 md:-left-6 lg:-left-8 xl:-left-12 2xl:-left-16 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B1120]/95 backdrop-blur-md border-2 border-[#3B82F6]/50 text-white flex items-center justify-center transition-all duration-300 hover:bg-[#3B82F6] hover:border-[#3B82F6] hover:scale-110 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer shadow-xl shadow-black/30"
-            >
-              <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
-            </button>
-
-            {/* Carousel Container with NO overflow restriction */}
-            <div className="relative w-full mx-auto">
-              <div
-                ref={carouselRef}
-                tabIndex={0}
-                aria-label="Daftar aplikasi. Gunakan tombol kiri dan kanan untuk berpindah."
-                onKeyDown={(event) => {
-                  if (event.key === 'ArrowLeft') {
-                    event.preventDefault();
-                    scrollCarousel('left');
-                  }
-                  if (event.key === 'ArrowRight') {
-                    event.preventDefault();
-                    scrollCarousel('right');
-                  }
-                }}
-                className="flex overflow-x-auto snap-x snap-mandatory gap-6 sm:gap-8 md:gap-10 lg:gap-12 py-20 px-16 sm:px-20 md:px-24 lg:px-32 xl:px-40 2xl:px-48 hide-scrollbar items-center carousel-smooth carousel-track-enhanced focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#3B82F6]"
-                style={{ overflow: 'visible' }}
-              >
-                {/* Infinite loop: duplicate items at both ends */}
-                {[...filteredPortals, ...filteredPortals, ...filteredPortals].map((portal, idx) => {
-                  const originalIdx = idx % filteredPortals.length;
-                  const themeIdx = MARQUEE_PORTALS.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
-                  const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
-
-                  return (
-                    <div key={`${portal.id}-${idx}`} data-carousel-item={idx} className="portal-item-enhanced carousel-snap-enhanced">
-                      <PortalAppItem portal={portal} theme={theme} themeIdx={themeIdx} />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right Navigation Arrow - positioned outside with more distance */}
-            <button
-              onClick={() => scrollCarousel('right')}
-              aria-label="Geser daftar aplikasi ke kanan"
-              title="Geser ke kanan"
-              className="absolute -right-2 sm:-right-4 md:-right-6 lg:-right-8 xl:-right-12 top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B1120]/95 backdrop-blur-md border-2 border-[#3B82F6]/50 text-white flex items-center justify-center transition-all duration-300 hover:bg-[#3B82F6] hover:border-[#3B82F6] hover:scale-110 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer shadow-xl shadow-black/30"
-            >
-              <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
-            </button>
-
-            {/* Enhanced Indicator Dots dengan spacing yang lebih baik */}
-            {filteredPortals.length > 1 && (
-              <div className="flex justify-center gap-3 mt-8">
-                {filteredPortals.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => goToSlide(idx)}
-                    aria-label={`Go to slide ${idx + 1}`}
-                    className={`rounded-full transition-all duration-500 cursor-pointer hover:scale-125 ${idx === currentIndex
-                        ? 'bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] w-10 h-3 shadow-[0_0_15px_rgba(59,130,246,0.6)] animate-pulse'
-                        : 'bg-white/20 hover:bg-white/40 w-3 h-3'
-                      }`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Bottom Button */}
-          <FadeIn y={20} delay={0.6} duration={0.6}>
-            <button
-              onClick={() => onNavigate('gallery')}
-              className="bg-[#1E293B]/80 hover:bg-[#1E293B] border border-white/10 backdrop-blur-md text-white/90 text-sm font-semibold px-6 py-3 rounded-full transition-all shadow-lg flex items-center gap-2 cursor-pointer"
-            >
-              <LayoutGrid className="w-4 h-4" />
-              <span>Lihat Semua Aplikasi</span>
-            </button>
           </FadeIn>
 
         </div>
-      </section>
+      </main>
 
       <LogoIntroModal isOpen={isIntroOpen} onClose={() => setIsIntroOpen(false)} />
+      
+      {/* Hide Webkit Scrollbar */}
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };

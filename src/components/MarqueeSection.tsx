@@ -231,7 +231,7 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
                 className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-lg group/card transition-all duration-500 hover:shadow-2xl hover:border-[#2B6CB0] hover:-translate-y-2 hover:scale-[1.02] cursor-pointer transform-gpu"
               >
                 <img
-                  src={item.previewImage || item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
+                  src={item.previewImage || item.customImage || `https://s0.wp.com/mshots/v1/${encodeURIComponent(item.url)}?w=800`}
                   alt={item.title}
                   loading="lazy"
                   draggable={false}
@@ -329,7 +329,7 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ onSelectSite }) 
                 className="relative flex-shrink-0 w-[300px] sm:w-[380px] md:w-[420px] h-[190px] sm:h-[230px] md:h-[260px] rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-lg group/card transition-all duration-500 hover:shadow-2xl hover:border-[#2B6CB0] hover:-translate-y-2 hover:scale-[1.02] cursor-pointer transform-gpu"
               >
                 <img
-                  src={item.previewImage || item.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${item.url}`}
+                  src={item.previewImage || item.customImage || `https://s0.wp.com/mshots/v1/${encodeURIComponent(item.url)}?w=800`}
                   alt={item.title}
                   loading="lazy"
                   draggable={false}

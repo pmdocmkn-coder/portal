@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { HeroSection } from './components/HeroSection';
-import { MarqueeSection } from './components/MarqueeSection';
-import { PortalGallerySection } from './components/PortalGallerySection';
-import { AboutSection } from './components/AboutSection';
-import { ProjectsSection } from './components/ProjectsSection';
+import { StatsSection } from './components/StatsSection';
 import { FooterSection } from './components/FooterSection';
 import { SitePreviewModal } from './components/ui/SitePreviewModal';
 import { ContactModal } from './components/ui/ContactModal';
@@ -28,23 +25,8 @@ export default function App() {
         onNavigate={handleNavigate}
       />
 
-      {/* 2. Draggable Motion Marquee */}
-      <MarqueeSection onSelectSite={(site) => setSelectedSite(site)} />
-
-      {/* 3. Company Web Portal Live Directory (Direktori Web Portal Live) */}
-      <div id="gallery">
-        <PortalGallerySection onSelectSite={(site) => setSelectedSite(site)} />
-      </div>
-
-      {/* 4. Company Overview Section */}
-      <div id="overview">
-        <AboutSection onOpenContact={() => setIsContactOpen(true)} />
-      </div>
-
-      {/* 5. Enterprise Projects Section */}
-      <div id="projects">
-        <ProjectsSection onOpenContact={() => setIsContactOpen(true)} />
-      </div>
+      {/* 2. Stats Section */}
+      <StatsSection />
 
       {/* Footer */}
       <FooterSection
