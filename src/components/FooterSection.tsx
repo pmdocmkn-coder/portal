@@ -1,6 +1,8 @@
-import React from 'react';
-import { ChevronUp, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronUp } from 'lucide-react';
+import { FacebookLogo, TwitterLogo, LinkedinLogo, InstagramLogo, TiktokLogo } from '@phosphor-icons/react';
 import { MKNLogo } from './ui/MKNLogo';
+import { supabase } from '../lib/supabase';
 
 interface FooterSectionProps {
   onOpenContact?: () => void;
@@ -8,6 +10,28 @@ interface FooterSectionProps {
 }
 
 export const FooterSection: React.FC<FooterSectionProps> = () => {
+  const [settings, setSettings] = useState({
+    facebook_url: '',
+    twitter_url: '',
+    linkedin_url: '',
+    instagram_url: '',
+    tiktok_url: '',
+    company_name: '',
+    company_address: '',
+    contact_phone: '',
+    contact_email: '',
+    company_website: '',
+    logo_url: ''
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase.from('site_settings').select('*').eq('id', 1).single();
+      if (data) setSettings(data);
+    };
+    fetchSettings();
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -19,21 +43,27 @@ export const FooterSection: React.FC<FooterSectionProps> = () => {
           
           {/* Left: Logo and Address */}
           <div className="flex flex-row items-center gap-5">
-            <div className="h-10 lg:h-12 w-auto flex-shrink-0" style={{ filter: 'brightness(0) invert(1)', opacity: 0.9 }}>
-                <MKNLogo size="sm" showSubtext={false} />
-            </div>
+            {settings.logo_url ? (
+               <div className="h-10 lg:h-12 w-auto flex-shrink-0 flex items-center bg-white/10 p-1.5 rounded-lg border border-white/20">
+                  <img src={settings.logo_url} alt="Logo" className="h-full w-auto object-contain" style={{ filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
+               </div>
+            ) : (
+               <div className="h-10 lg:h-12 w-auto flex-shrink-0" style={{ filter: 'brightness(0) invert(1)', opacity: 0.9 }}>
+                  <MKNLogo size="sm" showSubtext={false} />
+               </div>
+            )}
             
             <div className="self-stretch w-[1px] bg-white/20 hidden sm:block"></div>
             
             <div className="text-white/60 text-xs leading-relaxed max-w-xl py-1">
-              <p className="font-semibold text-white/90 mb-0.5 text-sm">PT Multi Kontrol Nusantara</p>
-              <p>KPC Communication Building, Tango Delta D8, Sangatta</p>
+              <p className="font-semibold text-white/90 mb-0.5 text-sm">{settings.company_name}</p>
+              <p className="whitespace-pre-wrap">{settings.company_address}</p>
               <div className="flex flex-wrap items-center gap-x-3 mt-0.5">
-                 <span>Telp. 0549-2026162</span>
-                 <span className="w-1 h-1 rounded-full bg-white/30 hidden sm:block"></span>
-                 <span>E-mail : contact@mkncorp.com</span>
-                 <span className="w-1 h-1 rounded-full bg-white/30 hidden sm:block"></span>
-                 <span>Website : www.mkncorp.com</span>
+                 {settings.contact_phone && <span>Telp. {settings.contact_phone}</span>}
+                 {settings.contact_phone && settings.contact_email && <span className="w-1 h-1 rounded-full bg-white/30 hidden sm:block"></span>}
+                 {settings.contact_email && <span>E-mail : {settings.contact_email}</span>}
+                 {settings.contact_email && settings.company_website && <span className="w-1 h-1 rounded-full bg-white/30 hidden sm:block"></span>}
+                 {settings.company_website && <span>Website : {settings.company_website}</span>}
               </div>
             </div>
           </div>
@@ -42,18 +72,31 @@ export const FooterSection: React.FC<FooterSectionProps> = () => {
           <div className="flex flex-col items-start md:items-end gap-4 mt-4 md:mt-0">
             
             <div className="flex items-center gap-4">
-                <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="Facebook">
-                  <Facebook className="w-3.5 h-3.5 stroke-[2]" />
-                </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="Twitter">
-                  <Twitter className="w-3.5 h-3.5 stroke-[2]" />
-                </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="LinkedIn">
-                  <Linkedin className="w-3.5 h-3.5 stroke-[2]" />
-                </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="Instagram">
-                  <Instagram className="w-3.5 h-3.5 stroke-[2]" />
-                </a>
+                {settings.facebook_url && (
+                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="Facebook">
+                    <FacebookLogo size={16} weight="fill" />
+                  </a>
+                )}
+                {settings.twitter_url && (
+                  <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="Twitter">
+                    <TwitterLogo size={16} weight="fill" />
+                  </a>
+                )}
+                {settings.linkedin_url && (
+                  <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="LinkedIn">
+                    <LinkedinLogo size={16} weight="fill" />
+                  </a>
+                )}
+                {settings.instagram_url && (
+                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="Instagram">
+                    <InstagramLogo size={16} weight="bold" />
+                  </a>
+                )}
+                {settings.tiktok_url && (
+                  <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-[#1B3A6B] transition-all" title="TikTok">
+                    <TiktokLogo size={16} weight="bold" />
+                  </a>
+                )}
                 
                 {/* Simple Red Circle Scroll Button */}
                 <button 
