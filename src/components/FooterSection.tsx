@@ -42,14 +42,21 @@ export const FooterSection: React.FC<FooterSectionProps> = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
           
           {/* Left: Logo and Address */}
-          <div className="flex flex-row items-center gap-5">
+          <div className="flex flex-row items-center gap-6">
             {settings.logo_url ? (
-               <div className="h-10 lg:h-12 w-auto flex-shrink-0 flex items-center bg-white/10 p-1.5 rounded-lg border border-white/20">
-                  <img src={settings.logo_url} alt="Logo" className="h-full w-auto object-contain" style={{ filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
+               <div className="h-16 lg:h-20 w-auto flex-shrink-0 flex items-center group cursor-pointer transition-transform duration-500 hover:scale-110">
+                  <img 
+                    src={settings.logo_url} 
+                    alt="Logo" 
+                    className="h-full w-auto object-contain transition-all duration-500 group-hover:brightness-110 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" 
+                    style={{ filter: 'brightness(0) invert(1)', opacity: 0.95 }} 
+                  />
                </div>
             ) : (
-               <div className="h-10 lg:h-12 w-auto flex-shrink-0" style={{ filter: 'brightness(0) invert(1)', opacity: 0.9 }}>
-                  <MKNLogo size="sm" showSubtext={false} />
+               <div className="h-16 lg:h-20 w-auto flex-shrink-0 group cursor-pointer transition-transform duration-500 hover:scale-110" style={{ filter: 'brightness(0) invert(1)', opacity: 0.95 }}>
+                  <div className="transition-all duration-500 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                    <MKNLogo size="md" showSubtext={false} />
+                  </div>
                </div>
             )}
             

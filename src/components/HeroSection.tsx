@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { ArrowRight, Search, Code2, LayoutGrid, ChevronLeft, ChevronRight, Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv } from 'lucide-react';
+import { ArrowRight, Code2, LayoutGrid, ChevronLeft, ChevronRight, Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv } from 'lucide-react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import { LogoIntroModal } from './ui/LogoIntroModal';
 import { FadeIn } from './ui/FadeIn';
 import { MarqueeItem } from '../data/portalData';
@@ -97,6 +98,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
   });
   const [portals, setPortals] = useState<MarqueeItem[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -142,6 +144,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
         }));
         setPortals(mappedPortals as MarqueeItem[]);
       }
+      
+      setIsLoading(false);
     };
 
     fetchSettings();
@@ -231,27 +235,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
           
           {/* Logo Container */}
           <div 
-            className="flex items-center gap-4 cursor-pointer group" 
+            className={`flex items-center gap-3 cursor-pointer group transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
             onClick={() => setIsIntroOpen(true)}
           >
             {siteSettings.logo_url ? (
-              <div className="w-auto h-12 sm:h-14 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-auto h-12 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <img 
                   src={siteSettings.logo_url} 
                   alt="Logo" 
-                  className="max-h-full w-auto object-contain transition-all duration-300"
-                  style={!isScrolled ? { filter: 'brightness(0) invert(1)', opacity: 0.95 } : {}}
+                  className="max-h-full object-contain transition-all duration-300" 
+                  style={!isScrolled ? { filter: 'brightness(0) invert(1) drop-shadow(0px 2px 4px rgba(0,0,0,0.3))', opacity: 0.95 } : {}}
                 />
               </div>
             ) : (
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-lg shadow-sm flex items-center justify-center p-1.5 group-hover:scale-105 transition-transform overflow-hidden">
+              <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center p-1.5 group-hover:scale-105 transition-transform overflow-hidden">
                 <img src="/src/assets/images/logo_mkn.png" alt="MKN Logo" className="w-full h-full object-contain" />
               </div>
             )}
-            <span className={`font-extrabold tracking-tight hidden sm:block text-xl transition-all duration-300 ${!isScrolled ? 'drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]' : ''}`}>
-              <span className={`${!isScrolled ? 'text-white' : 'text-[#233B8E]'} transition-colors duration-300`}>MKN</span> 
-              <span className={`${!isScrolled ? 'text-white' : 'text-[#E05A44]'} transition-colors duration-300`}> SITE</span>
-            </span>
+              <span className={`font-extrabold tracking-tight hidden sm:block text-[22px] transition-all duration-300 ${!isScrolled ? 'drop-shadow-[0_0_12px_rgba(255,255,255,0.3)]' : ''}`}>
+                <span className={`transition-colors duration-300 ${!isScrolled ? 'text-white' : 'text-[#233B8E]'}`}>MKN</span> 
+                <span className={`transition-colors duration-300 ${!isScrolled ? 'text-white' : 'text-[#E05A44]'}`}> SITE</span>
+              </span>
           </div>
 
           {/* Navigation Container */}
@@ -275,21 +279,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-[1600px] mx-auto px-4 sm:px-6 pt-32 pb-24">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-[1600px] mx-auto px-6 pt-32 pb-24">
         <div className="w-full flex flex-col items-center justify-center min-h-[50vh] mt-[-40px]">
           
-          {/* Main Content (No Card) */}
-          <div className="w-full max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 px-4">
+          {/* Main Content */}
+          <div className={`w-full max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 px-4 transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
             <FadeIn y={30} duration={0.8} className="w-full mb-8">
-              <span className="inline-block rounded-full bg-white/90 shadow-sm px-5 py-2 text-[11px] uppercase tracking-[0.2em] font-bold text-[#E05A44] mb-6">
-                Eksplorasi Layanan
-              </span>
               
               <h1 className="text-5xl md:text-7xl lg:text-7xl font-black tracking-tight mb-6 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 leading-[1.2]">
                 <span 
                   className="text-transparent bg-clip-text bg-gradient-to-r from-[#E05A44] via-[#2BA5D4] to-[#233B8E] pb-2"
                   style={{ 
-                    filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.9)) drop-shadow(-1px -1px 0px rgba(255,255,255,0.9)) drop-shadow(1px -1px 0px rgba(255,255,255,0.9)) drop-shadow(-1px 1px 0px rgba(255,255,255,0.9)) drop-shadow(0px 4px 15px rgba(0,0,0,0.4))'
+                    filter: 'drop-shadow(2px 2px 0px rgba(255,255,255,0.9)) drop-shadow(-2px -2px 0px rgba(255,255,255,0.9)) drop-shadow(2px -2px 0px rgba(255,255,255,0.9)) drop-shadow(-2px 2px 0px rgba(255,255,255,0.9)) drop-shadow(0px 8px 16px rgba(0,0,0,0.3))'
                   }}
                 >
                   {siteSettings.hero_title}
@@ -297,25 +298,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
               </h1>
               
               <p 
-                className="text-lg md:text-xl text-white max-w-2xl mx-auto leading-relaxed font-semibold"
-                style={{ filter: 'drop-shadow(0px 2px 5px rgba(0,0,0,0.9)) drop-shadow(0px 0px 2px rgba(0,0,0,0.5))' }}
+                className="text-lg md:text-xl text-white max-w-2xl mx-auto leading-relaxed font-semibold drop-shadow-md"
+                style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))' }}
               >
                 {siteSettings.hero_subtitle}
               </p>
             </FadeIn>
 
             {/* Search Bar */}
-            <FadeIn y={30} delay={0.2} duration={0.8} className="w-full max-w-2xl px-4 mt-2 mb-12">
+            <FadeIn y={30} delay={0.2} duration={0.8} className="w-full max-w-2xl mx-auto px-4 mt-2 mb-12">
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-slate-400 group-focus-within:text-[#2BA5D4] transition-colors" />
+                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none z-10">
+                  <MagnifyingGlass weight="bold" className="h-5 w-5 text-white/60 group-focus-within:text-white transition-colors" />
                 </div>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari aplikasi atau layanan..."
-                  className="w-full bg-white/95 backdrop-blur-sm border border-white/50 rounded-full py-4 pl-16 pr-6 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#2BA5D4]/20 focus:border-[#2BA5D4] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] text-base font-medium"
+                  className="w-full bg-black/20 backdrop-blur-md border border-white/30 rounded-full py-4 pl-16 pr-6 text-white placeholder-white/70 focus:outline-none focus:bg-black/30 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all shadow-lg text-base font-medium"
                 />
               </div>
             </FadeIn>
@@ -323,7 +324,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
 
           {/* Carousel Section */}
           <FadeIn y={40} delay={0.3} duration={1} className="w-full relative">
-            {filteredPortals.length > 0 ? (
+            {isLoading ? (
+              <div className="h-[200px] w-full max-w-6xl mx-auto" />
+            ) : filteredPortals.length > 0 ? (
               <div className="w-full relative flex justify-center px-4">
                 {/* Centered Grid Container */}
                 <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-5 mx-auto w-full max-w-6xl justify-items-center place-content-center">

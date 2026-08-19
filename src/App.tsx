@@ -1,49 +1,41 @@
-import React, { useState } from 'react';
-import { HeroSection } from './components/HeroSection';
-import { StatsSection } from './components/StatsSection';
-import { FooterSection } from './components/FooterSection';
-import { SitePreviewModal } from './components/ui/SitePreviewModal';
-import { ContactModal } from './components/ui/ContactModal';
-import { PortalSite } from './types';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './contexts/AuthContext';
+
+// Pages
+import PublicPortal from './pages/PublicPortal';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminLayout from './pages/admin/AdminLayout';
+import Dashboard from './pages/admin/Dashboard';
+import PortalsManager from './pages/admin/PortalsManager';
+import Categories from './pages/admin/Categories';
+import AppearanceSettings from './pages/admin/AppearanceSettings';
+import HeroSliders from './pages/admin/HeroSliders';
+import Users from './pages/admin/Users';
+import ActivityLog from './pages/admin/ActivityLog';
 
 export default function App() {
-  const [selectedSite, setSelectedSite] = useState<PortalSite | null>(null);
-  const [isContactOpen, setIsContactOpen] = useState(false);
-
-  const handleNavigate = (sectionId: string) => {
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <div className="bg-[#F7F8FA] min-h-screen text-[#1A202C] font-sans overflow-x-clip selection:bg-[#1B3A6B] selection:text-white">
-      {/* 1. Hero Section with Sticky Header */}
-      <HeroSection
-        onOpenContact={() => setIsContactOpen(true)}
-        onNavigate={handleNavigate}
-      />
-
-      {/* 2. Stats Section */}
-      <StatsSection />
-
-      {/* Footer */}
-      <FooterSection
-        onOpenContact={() => setIsContactOpen(true)}
-        onNavigate={handleNavigate}
-      />
-
-      {/* Modals */}
-      <SitePreviewModal
-        site={selectedSite}
-        onClose={() => setSelectedSite(null)}
-      />
-
-      <ContactModal
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
-      />
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Toaster position="top-right" />
+        <Routes>
+          <Route path="/" element={<PublicPortal />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="portals" element={<PortalsManager />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="appearance" element={<AppearanceSettings />} />
+            <Route path="sliders" element={<HeroSliders />} />
+            <Route path="users" element={<Users />} />
+            <Route path="activity" element={<ActivityLog />} />
+            <Route path="*" element={<Navigate to="/admin" replace />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
