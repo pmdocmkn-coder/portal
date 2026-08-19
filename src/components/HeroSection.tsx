@@ -57,25 +57,25 @@ const CARD_THEMES = [
 ];
 
 const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number, portal: MarqueeItem, theme: typeof CARD_THEMES[0], themeIdx: number, idx: number }) => {
-  const isCircle = idx % 2 === 0;
+  const isCircle = true; // Always use circle to match reference nicely, or keep the alternating logic. Let's make it always circle.
   let displayTitle = portal.title.replace(' Portal', '');
   
   return (
     <a
       href={portal.url}
-      className="group w-full max-w-[280px] flex flex-col md:flex-row items-center md:items-center justify-start text-center md:text-left gap-2 md:gap-4 p-2.5 md:p-3.5 rounded-[1rem] md:rounded-2xl bg-white/60 backdrop-blur-xl hover:bg-white border border-white/60 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 outline-none"
+      className="group w-full max-w-[280px] flex flex-row items-center justify-start gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none"
     >
-      <div className={`w-10 h-10 md:w-14 md:h-14 shrink-0 bg-white flex items-center justify-center shadow-sm p-0.5 md:p-1 border border-white group-hover:scale-105 transition-transform duration-300 overflow-hidden ${isCircle ? 'rounded-full' : 'rounded-[10px] md:rounded-[14px]'}`}>
+      <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 bg-white flex items-center justify-center shadow-sm p-1 border-2 border-white/90 group-hover:scale-105 transition-transform duration-300 overflow-hidden rounded-full`}>
          {portal.customIcon ? (
-           <img src={portal.customIcon} alt={displayTitle} className={`w-full h-full object-contain mix-blend-multiply scale-[1.05] ${isCircle ? 'rounded-full' : 'rounded-[8px] md:rounded-[12px]'}`} />
+           <img src={portal.customIcon} alt={displayTitle} className={`w-full h-full object-contain mix-blend-multiply scale-[1.05] rounded-full`} />
          ) : (
-           <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center ${isCircle ? 'rounded-full' : 'rounded-[10px] md:rounded-[14px]'}`}>
+           <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full`}>
              {getIconForPortal(themeIdx, `w-5 h-5 md:w-6 md:h-6`)}
            </div>
          )}
       </div>
       <div className="flex flex-col flex-1 min-w-0 text-left justify-center w-full">
-         <h3 className="text-slate-900 font-bold text-[10px] sm:text-[11px] md:text-[14px] leading-[1.2] md:leading-snug line-clamp-2 md:line-clamp-2 mt-0.5 md:mt-0 text-center md:text-left">{displayTitle}</h3>
+         <h3 className="text-white font-bold text-[11px] sm:text-[13px] md:text-[15px] leading-[1.2] md:leading-snug line-clamp-2 drop-shadow-sm">{displayTitle}</h3>
       </div>
     </a>
   );
@@ -316,7 +316,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari aplikasi atau layanan..."
-                  className="w-full bg-black/20 backdrop-blur-md border border-white/30 rounded-full py-4 pl-16 pr-6 text-white placeholder-white/70 focus:outline-none focus:bg-black/30 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all shadow-lg text-base font-medium"
+                  className="w-full bg-white/10 backdrop-blur-md border border-white/30 rounded-full py-4 pl-16 pr-6 text-white placeholder-white/70 focus:outline-none focus:bg-white/20 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all shadow-lg text-base font-medium"
                 />
               </div>
             </FadeIn>
@@ -350,7 +350,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
           <FadeIn y={20} delay={0.5} duration={1}>
             <button 
               onClick={onExpandPortals}
-              className="mt-4 px-8 py-3 rounded-full border-2 border-[#E85D44] bg-white/90 hover:bg-[#E85D44] text-[#E85D44] hover:text-white font-bold text-[13px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-sm"
+              className="mt-8 px-8 py-3.5 rounded-full border border-white/30 bg-white/20 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-md"
             >
               Lihat Semua Portal 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1 stroke-[3]" />
