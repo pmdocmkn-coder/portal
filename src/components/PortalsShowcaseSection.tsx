@@ -5,22 +5,41 @@ import workerImage from '../assets/images/real_worker2.png';
 import { supabase } from '../lib/supabase';
 
 export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?: boolean }> = ({ onClose, isClosing }) => {
-  const [isShowingAll, setIsShowingAll] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('Semua');
-  const [portals, setPortals] = useState<MarqueeItem[]>([]);
+  const [portals, setPortals] = React.useState<MarqueeItem[]>([]);
+  const [dbCategories, setDbCategories] = React.useState<string[]>([]);
+  const [activeCategory, setActiveCategory] = React.useState('Semua');
+  const [isShowingAll, setIsShowingAll] = React.useState(false);
 
   React.useEffect(() => {
-    const fetchPortals = async () => {
-      const { data } = await supabase.from('portal_items').select('*').order('created_at', { ascending: false });
-      if (data) {
-        setPortals(data as MarqueeItem[]);
+    const fetchData = async () => {
+      const [portalsRes, catsRes] = await Promise.all([
+        supabase.from('portal_items').select('*').order('created_at', { ascending: false }),
+        supabase.from('categories').select('name').eq('is_active', true).order('display_order', { ascending: true })
+      ]);
+
+      if (portalsRes.data) {
+        const mappedPortals = portalsRes.data.map((item: any) => ({
+          ...item,
+          customIcon: item.custom_image
+        }));
+        setPortals(mappedPortals as MarqueeItem[]);
+      }
+
+      if (catsRes.data) {
+        setDbCategories(catsRes.data.map((c: any) => c.name));
       }
     };
-    fetchPortals();
+    fetchData();
   }, []);
 
-  // Extract unique categories for the filter tabs
-  const categories = ['Semua', 'Operasional', 'Manajemen', 'Training', 'Layanan', 'Keamanan'];
+  // Use database categories or fallback to dynamic extraction if empty
+  const categories = React.useMemo(() => {
+    if (dbCategories.length > 0) {
+      return ['Semua', ...dbCategories];
+    }
+    const uniqueCategories = new Set(portals.map(p => p.category).filter(Boolean));
+    return ['Semua', ...Array.from(uniqueCategories)];
+  }, [dbCategories, portals]);
 
   // Filter logic
   const filteredPortals = portals.filter(portal => {
@@ -44,9 +63,9 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-50/50 group-hover:to-orange-50/50 transition-all duration-500"></div>
 
         {/* Icon Circle */}
-        <div className="w-10 h-10 md:w-14 md:h-14 shrink-0 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-100 p-1.5 md:p-2.5 relative z-10 group-hover:scale-105 transition-transform duration-300">
+        <div className={`w-10 h-10 md:w-14 md:h-14 shrink-0 flex items-center justify-center relative z-10 group-hover:scale-105 transition-transform duration-300 ${!portal.customIcon ? 'rounded-full bg-white shadow-sm border border-slate-100 p-1.5 md:p-2.5' : ''}`}>
           {portal.customIcon ? (
-            <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain" />
+            <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
           ) : (
             <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-[8px] md:text-[10px] font-black text-slate-500">
               MKN
@@ -166,8 +185,8 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
            </div>
 
            {/* Pill Tabs */}
-           <div className="w-full flex justify-center lg:justify-start mb-6 md:mb-8">
-             <div className="flex flex-row overflow-x-auto gap-2 hide-scrollbar py-1 px-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+           <div className="w-full flex justify-start lg:justify-start mb-6 md:mb-8 px-4 lg:px-0 -mx-4 lg:mx-0">
+             <div className="flex flex-row overflow-x-auto gap-2 hide-scrollbar py-1 px-4 lg:px-1 w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                {categories.map(cat => (
                  <button
                    key={cat}
@@ -197,29 +216,29 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                     <a 
                       key={`${portal.id}-${idx}`} 
                       href={portal.url} 
-                      className="group relative flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-start text-center lg:text-left gap-2 lg:gap-4 p-3 sm:p-4 rounded-[1.25rem] lg:rounded-2xl bg-white/30 backdrop-blur-xl border border-white/40 shadow-sm hover:bg-white/50 hover:border-white/60 hover:shadow-md hover:-translate-y-1 transition-all duration-300 w-full aspect-square lg:aspect-auto"
+                      className="group relative flex flex-row items-center justify-start text-left gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-white/30 backdrop-blur-md border border-white/50 shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:-translate-y-1 hover:bg-white/50 transition-all duration-300 w-full"
                     >
                       {/* Icon Box */}
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full lg:rounded-[14px] bg-white flex items-center justify-center p-2 lg:p-2.5 relative z-10 transition-transform duration-300 shadow-sm border border-slate-100 group-hover:scale-105">
+                      <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'rounded-full bg-white p-1 border-2 border-white/90 shadow-sm overflow-hidden' : ''}`}>
                         {portal.customIcon ? (
-                          <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain" />
+                          <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
                         ) : (
-                          <div className="w-full h-full rounded-md flex items-center justify-center text-[10px] md:text-xs font-black text-[#E85D44]">
+                          <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] font-black text-[#E85D44] bg-[#E85D44]/10">
                             MKN
                           </div>
                         )}
                       </div>
 
                       {/* Text */}
-                      <div className="flex flex-col relative z-10 flex-grow pr-0 lg:pr-6 w-full items-center lg:items-start justify-center">
-                        <h3 className="text-[11px] sm:text-xs lg:text-sm font-bold text-[#0B1B3D] leading-[1.2] lg:leading-snug group-hover:text-[#E85D44] transition-colors line-clamp-2">
+                      <div className="flex flex-col relative z-10 flex-grow pr-4 w-full justify-center">
+                        <h3 className="text-[12px] sm:text-[13px] md:text-[15px] font-bold text-[#0B1B3D] leading-[1.2] md:leading-snug group-hover:text-[#E85D44] transition-colors line-clamp-2">
                           {displayTitle}
                         </h3>
                       </div>
 
-                      {/* Arrow Icon - Desktop Only */}
-                      <div className="hidden lg:block absolute right-4 text-slate-300 group-hover:text-[#E85D44] transform translate-x-1 group-hover:translate-x-0 transition-all duration-300">
-                        <ArrowUpRight className="w-5 h-5" />
+                      {/* Arrow Icon */}
+                      <div className="absolute right-4 text-slate-400 group-hover:text-[#E85D44] transform group-hover:translate-x-1 transition-all duration-300">
+                        <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5" />
                       </div>
                     </a>
                   );

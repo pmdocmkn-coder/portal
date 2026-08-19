@@ -65,9 +65,9 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
       href={portal.url}
       className="group w-full max-w-[280px] flex flex-row items-center justify-start gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none"
     >
-      <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 bg-white flex items-center justify-center shadow-sm p-1 border-2 border-white/90 group-hover:scale-105 transition-transform duration-300 overflow-hidden rounded-full`}>
+      <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
          {portal.customIcon ? (
-           <img src={portal.customIcon} alt={displayTitle} className={`w-full h-full object-contain mix-blend-multiply scale-[1.05] rounded-full`} />
+           <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
          ) : (
            <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full`}>
              {getIconForPortal(themeIdx, `w-5 h-5 md:w-6 md:h-6`)}
@@ -288,9 +288,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
               
               <h1 className="text-5xl md:text-7xl lg:text-7xl font-black tracking-tight mb-6 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 leading-[1.2]">
                 <span 
-                  className="text-transparent bg-clip-text bg-gradient-to-r from-[#E05A44] via-[#2BA5D4] to-[#233B8E] pb-2"
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-[#E05A44] via-[#2BA5D4] to-[#233B8E] pb-2 drop-shadow-xl"
                   style={{ 
-                    filter: 'drop-shadow(2px 2px 0px rgba(255,255,255,0.9)) drop-shadow(-2px -2px 0px rgba(255,255,255,0.9)) drop-shadow(2px -2px 0px rgba(255,255,255,0.9)) drop-shadow(-2px 2px 0px rgba(255,255,255,0.9)) drop-shadow(0px 8px 16px rgba(0,0,0,0.3))'
+                    WebkitTextStroke: '2px white'
                   }}
                 >
                   {siteSettings.hero_title}
