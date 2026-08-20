@@ -33,10 +33,7 @@ export default function AppearanceSettings() {
 
   const fetchSettings = async () => {
     try {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('*')
-        .single();
+      const { data, error } = await supabase.from('site_settings').select('*').maybeSingle();
       
       if (error) {
         if (error.code !== 'PGRST116') throw error;
@@ -67,7 +64,7 @@ export default function AppearanceSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { data: existing } = await supabase.from('site_settings').select('id').single();
+      const { data: existing } = await supabase.from('site_settings').select('id').maybeSingle();
       
       let error;
       if (existing) {
