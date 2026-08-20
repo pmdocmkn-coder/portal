@@ -14,7 +14,9 @@ import {
   ImageSquare,
   ShieldCheck,
   Clock,
-  List
+  List,
+  Globe,
+  ArrowUpRight
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -120,7 +122,33 @@ export default function AdminLayout() {
         </nav>
 
       {/* Sidebar Footer */}
-      <div className="p-4 border-t border-[#1e293b]">
+      <div className="p-4 border-t border-[#1e293b] flex flex-col gap-2">
+        <Link 
+          to="/"
+          target="_blank"
+          title="Buka Halaman Portal"
+          className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between p-3'} rounded-xl hover:bg-white/5 transition-colors cursor-pointer group text-left text-slate-300 hover:text-white`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#3b82f6]/20 flex items-center justify-center shrink-0 border border-[#3b82f6]/30">
+              <Globe className="w-4 h-4 text-[#3b82f6]" weight="bold" />
+            </div>
+            {!isCollapsed && (
+              <div className="overflow-hidden">
+                <p className="text-sm font-bold truncate">
+                  Lihat Portal
+                </p>
+                <p className="text-[11px] text-slate-400 font-medium truncate">
+                  Buka halaman publik
+                </p>
+              </div>
+            )}
+          </div>
+          {!isCollapsed && <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-[#3b82f6] transition-colors shrink-0" weight="bold" />}
+        </Link>
+        
+        <div className="h-px bg-[#1e293b] w-full my-1"></div>
+
         <Link 
           to="/admin/profile"
           title="Profil Saya"
