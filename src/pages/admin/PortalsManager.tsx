@@ -38,11 +38,17 @@ export default function PortalsManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [dbCategories, setDbCategories] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(10);
 
   useEffect(() => {
     fetchPortals();
     fetchCategoriesFromDB();
   }, []);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [searchQuery, selectedCategory]);
 
   const fetchCategoriesFromDB = async () => {
     const { data } = await supabase
@@ -304,7 +310,7 @@ export default function PortalsManager() {
           </div>
         )}
 
-        {filteredPortals.map((portal) => (
+        {filteredPortals.slice(0, visibleCount).map((portal) => (
           <div 
             key={portal.id} 
             className="group relative bg-white rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-slate-100/50 transition-all duration-300 hover:-translate-y-1.5 flex flex-col cursor-pointer"
@@ -364,6 +370,18 @@ export default function PortalsManager() {
           </div>
         ))}
       </div>
+
+      {/* Load More Button */}
+      {visibleCount < filteredPortals.length && (
+        <div className="flex justify-center mt-8 mb-4">
+          <button
+            onClick={() => setVisibleCount(prev => prev + 10)}
+            className="bg-white border border-slate-200 text-[#1B3A6B] px-6 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm hover:shadow-md hover:border-[#1B3A6B]/30 hover:bg-slate-50 active:scale-95 transition-all duration-300"
+          >
+            Muat Lebih Banyak ({filteredPortals.length - visibleCount} tersisa)
+          </button>
+        </div>
+      )}
 
       {isModalOpen && createPortal(
         <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 overflow-y-auto custom-scrollbar">

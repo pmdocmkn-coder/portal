@@ -215,6 +215,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
   return (
     <div id="home" className="relative bg-[#F8FAFC] min-h-screen text-slate-900 font-sans selection:bg-[#3B82F6] selection:text-white flex flex-col overflow-hidden">
       
+      {/* SVG Filter for Logo */}
+      <svg width="0" height="0" className="absolute pointer-events-none" style={{ visibility: 'hidden' }}>
+        <filter id="mkn-logo-filter" colorInterpolationFilters="sRGB">
+          <feColorMatrix type="matrix" values="
+            0.999 -2.017 -1.000 0 1
+           -0.001 -1.017 -1.000 0 1
+           -1.367  1.069 -1.000 0 1
+            0      0      0     1 0
+          " />
+        </filter>
+      </svg>
       {/* Background Image Slider */}
       {heroImages.map((img, idx) => (
         <div 
@@ -233,31 +244,32 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
 
       {/* HEADER */}
       <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-slate-200/60' : 'bg-transparent border-transparent'}`}>
-        <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-[1600px] mx-auto px-6 h-24 flex items-center justify-between">
           
           {/* Logo Container */}
           <div 
-            className={`flex items-center gap-3 cursor-pointer group transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+            className={`flex items-center cursor-pointer group transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
             onClick={() => setIsIntroOpen(true)}
           >
             {siteSettings.logo_url ? (
-              <div className="w-auto h-12 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-auto h-16 md:h-20 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <img 
                   src={siteSettings.logo_url} 
                   alt="Logo" 
                   className="max-h-full object-contain transition-all duration-300" 
-                  style={!isScrolled ? { filter: 'brightness(0) invert(1) drop-shadow(0px 2px 4px rgba(0,0,0,0.3))', opacity: 0.95 } : {}}
+                  style={!isScrolled ? { filter: 'url(#mkn-logo-filter) drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' } : {}}
                 />
               </div>
             ) : (
-              <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center p-1.5 group-hover:scale-105 transition-transform overflow-hidden">
-                <img src="/src/assets/images/logo_mkn.png" alt="MKN Logo" className="w-full h-full object-contain" />
+              <div className="w-auto h-16 md:h-20 flex items-center justify-center p-1 group-hover:scale-105 transition-transform overflow-hidden">
+                <img 
+                  src="/src/assets/images/logo_mkn.png" 
+                  alt="MKN Logo" 
+                  className="max-h-full object-contain transition-all duration-300" 
+                  style={!isScrolled ? { filter: 'url(#mkn-logo-filter) drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' } : {}} 
+                />
               </div>
             )}
-              <span className={`font-extrabold tracking-tight hidden sm:block text-[22px] transition-all duration-300 ${!isScrolled ? 'drop-shadow-[0_0_12px_rgba(255,255,255,0.3)]' : ''}`}>
-                <span className={`transition-colors duration-300 ${!isScrolled ? 'text-white' : 'text-[#233B8E]'}`}>MKN</span> 
-                <span className={`transition-colors duration-300 ${!isScrolled ? 'text-white' : 'text-[#E05A44]'}`}> SITE</span>
-              </span>
           </div>
 
           {/* Navigation Container */}
