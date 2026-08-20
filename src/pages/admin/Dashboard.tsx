@@ -21,6 +21,7 @@ export default function Dashboard() {
 
   const [chartPath, setChartPath] = useState('');
   const [chartLabels, setChartLabels] = useState<string[]>([]);
+  const [chartPoints, setChartPoints] = useState<{x: number, y: number, value: number}[]>([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -73,33 +74,46 @@ export default function Dashboard() {
         }));
 
       // Generate Chart Path
-      const visitors = visitorsRes.data || [];
+      let dataToChart = visitorsRes.data || [];
       
-      // If we don't have enough data, generate some zeroes or use a fallback line
-      if (visitors.length < 2) {
+      // If we don't have enough data, generate a fake 0 point for the previous day
+      if (dataToChart.length === 1) {
+        const singleDate = new Date(dataToChart[0].date);
+        singleDate.setDate(singleDate.getDate() - 1);
+        dataToChart = [
+          { date: singleDate.toISOString().split('T')[0], count: 0 },
+          dataToChart[0]
+        ];
+      }
+      
+      if (dataToChart.length < 2) {
         setChartPath('M0,200 L1000,200');
         setChartLabels(['30 Hari Lalu', 'Hari Ini']);
+        setChartPoints([]);
       } else {
-        const maxCount = Math.max(...visitors.map(v => v.count), 10);
+        const maxCount = Math.max(...dataToChart.map(v => v.count), 10);
         const width = 1000;
         const height = 140; // max height from top (Y from 60 to 200)
         
-        const pathData = visitors.reduce((acc, v, i, arr) => {
-          const x = (i / (arr.length - 1)) * width;
-          const y = 200 - (v.count / maxCount) * height;
+        const pts = dataToChart.map((v, i, arr) => ({
+          x: (i / (arr.length - 1)) * width,
+          y: 200 - (v.count / maxCount) * height,
+          value: v.count
+        }));
+        
+        setChartPoints(pts);
+        
+        const pathData = pts.reduce((acc, pt, i, arr) => {
+          if (i === 0) return `M${pt.x},${pt.y}`;
           
-          if (i === 0) return `M${x},${y}`;
-          
-          const prevX = ((i - 1) / (arr.length - 1)) * width;
-          const prevY = 200 - (arr[i - 1].count / maxCount) * height;
-          
+          const prev = arr[i - 1];
           // Simple cubic bezier curve for smoothing
-          const cpX1 = prevX + (x - prevX) * 0.5;
-          const cpY1 = prevY;
-          const cpX2 = prevX + (x - prevX) * 0.5;
-          const cpY2 = y;
+          const cpX1 = prev.x + (pt.x - prev.x) * 0.5;
+          const cpY1 = prev.y;
+          const cpX2 = prev.x + (pt.x - prev.x) * 0.5;
+          const cpY2 = pt.y;
           
-          return `${acc} C${cpX1},${cpY1} ${cpX2},${cpY2} ${x},${y}`;
+          return `${acc} C${cpX1},${cpY1} ${cpX2},${cpY2} ${pt.x},${pt.y}`;
         }, '');
 
         setChartPath(pathData);
@@ -111,9 +125,9 @@ export default function Dashboard() {
         };
         
         setChartLabels([
-          formatDate(visitors[0].date),
-          formatDate(visitors[Math.floor(visitors.length / 2)].date),
-          formatDate(visitors[visitors.length - 1].date)
+          formatDate(dataToChart[0].date),
+          formatDate(dataToChart[Math.floor(dataToChart.length / 2)].date),
+          formatDate(dataToChart[dataToChart.length - 1].date)
         ]);
       }
 
@@ -127,10 +141,38 @@ export default function Dashboard() {
     };
 
     fetchStats();
+    
+    // Live updates subscriptions
+    const visitorsSub = supabase
+      .channel('public:daily_visitors')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_visitors' }, fetchStats)
+      .subscribe();
+
+    const clicksSub = supabase
+      .channel('public:portal_clicks')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'portal_clicks' }, fetchStats)
+      .subscribe();
+
+    const activitySub = supabase
+      .channel('public:activity_logs')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, fetchStats)
+      .subscribe();
+
+    const settingsSub = supabase
+      .channel('public:site_settings_dashboard')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, fetchStats)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(visitorsSub);
+      supabase.removeChannel(clicksSub);
+      supabase.removeChannel(activitySub);
+      supabase.removeChannel(settingsSub);
+    };
   }, []);
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-6">
+    <div className="animate-fade-in-up space-y-6">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -221,6 +263,20 @@ export default function Dashboard() {
               strokeLinecap="round" 
               strokeLinejoin="round" 
             />
+            {/* The data points */}
+            {chartPoints.map((pt, idx) => (
+              <g key={idx} className="group cursor-pointer">
+                <circle cx={pt.x} cy={pt.y} r="6" fill="#fff" stroke="#0f172a" strokeWidth="3" className="transition-all duration-300 group-hover:r-[8px] group-hover:stroke-[4px]" />
+                <text 
+                  x={pt.x} 
+                  y={pt.y - 16} 
+                  textAnchor={idx === 0 ? 'start' : idx === chartPoints.length - 1 ? 'end' : 'middle'} 
+                  className="text-[12px] font-bold fill-slate-700 opacity-80 group-hover:opacity-100 transition-opacity"
+                >
+                  {pt.value}
+                </text>
+              </g>
+            ))}
           </svg>
         </div>
 
@@ -305,3 +361,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

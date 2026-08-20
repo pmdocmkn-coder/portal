@@ -66,19 +66,19 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
-      className="group w-full max-w-[280px] flex flex-row items-center justify-start gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none"
+      className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none w-full max-w-[280px]"
     >
-      <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
+      <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
          {portal.customIcon ? (
            <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
          ) : (
-           <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full`}>
+           <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full text-[10px] sm:text-xs font-black`}>
              {getIconForPortal(themeIdx, `w-5 h-5 md:w-6 md:h-6`)}
            </div>
          )}
       </div>
-      <div className="flex flex-col flex-1 min-w-0 text-left justify-center w-full">
-         <h3 className="text-white font-bold text-[11px] sm:text-[13px] md:text-[15px] leading-[1.2] md:leading-snug line-clamp-2 drop-shadow-sm">{displayTitle}</h3>
+      <div className="flex flex-col relative z-10 sm:flex-grow sm:pr-4 w-full justify-center">
+         <h3 className="text-[11px] leading-tight sm:text-[13px] md:text-[15px] font-bold text-white sm:leading-snug line-clamp-2 drop-shadow-sm">{displayTitle}</h3>
       </div>
     </a>
   );

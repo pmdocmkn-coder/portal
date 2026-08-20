@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @layer base {
   :root {
@@ -125,7 +125,7 @@
 
 @keyframes logoMknFloat {
   0%, 100% {
-    transform: translateY(0) scale(1) rotate(0deg);
+    transform: none scale(1) rotate(0deg);
   }
   25% {
     transform: translateY(-8px) scale(1.02) rotate(1deg);
@@ -185,7 +185,7 @@
 /* Enhanced card animations */
 @keyframes cardHover {
   0% {
-    transform: translateY(0) scale(1) rotateY(0deg);
+    transform: none scale(1) rotateY(0deg);
   }
   100% {
     transform: translateY(-8px) scale(1.02) rotateY(2deg);
@@ -449,4 +449,15 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+
+@keyframes fadeInSlideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInSlideUp 0.5s ease-out forwards;
+}
+
 

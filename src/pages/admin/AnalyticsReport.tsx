@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Users, CursorClick, CalendarBlank } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
@@ -40,7 +40,7 @@ export default function AnalyticsReport() {
   const totalClicks30Days = portalClicks.reduce((acc, c) => acc + c.clicks, 0);
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8 pb-12">
+    <div className="animate-fade-in-up space-y-8 pb-12">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -154,3 +154,4 @@ export default function AnalyticsReport() {
     </div>
   );
 }
+

@@ -96,11 +96,11 @@ export default function AppearanceSettings() {
         });
       }
 
-      toast.success('Pengaturan berhasil disimpan!', { id: toastId });
+      toast.success('Pengaturan berhasil disimpan!');
       setInitialSettings(settings);
       setIsDirty(false);
     } catch (err: any) {
-      toast.error('Gagal menyimpan pengaturan', { id: toastId });
+      toast.error('Gagal menyimpan pengaturan');
     } finally {
       setSaving(false);
     }
@@ -191,7 +191,7 @@ export default function AppearanceSettings() {
   if (loading) return <div className="p-8 text-slate-500">Memuat...</div>;
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8 pb-12">
+    <div className="animate-fade-in-up space-y-8 pb-12">
       
       {/* Header */}
       <AdminHeader 
@@ -564,3 +564,4 @@ export default function AppearanceSettings() {
     </div>
   );
 }
+

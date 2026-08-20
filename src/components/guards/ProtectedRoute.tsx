@@ -1,0 +1,44 @@
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import toast from 'react-hot-toast';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  pageKey?: string; // optional - if not provided, just checks auth
+}
+
+export function ProtectedRoute({ children, pageKey }: ProtectedRouteProps) {
+  const { session, loading, userRole, canAccessPage } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-slate-200 border-t-[#1B3A6B] rounded-full animate-spin" />
+          <p className="text-slate-500 text-sm font-medium">Memuat...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in
+  if (!session) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  // No admin/editor role at all
+  if (!userRole || (userRole !== 'admin' && userRole !== 'editor')) {
+    toast.error('Anda tidak memiliki akses ke halaman admin');
+    return <Navigate to="/" replace />;
+  }
+
+  // Check page-level permission (admin always passes, editor checks DB permissions)
+  if (pageKey && !canAccessPage(pageKey)) {
+    toast.error('Anda tidak memiliki izin untuk mengakses halaman ini');
+    return <Navigate to="/admin" replace />;
+  }
+
+  return <>{children}</>;
+}

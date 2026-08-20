@@ -152,7 +152,7 @@ export default function HeroSliders() {
   if (loading) return <div className="p-8 text-slate-500">Memuat...</div>;
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8 pb-12">
+    <div className="animate-fade-in-up space-y-8 pb-12">
       
       {/* Header */}
       <AdminHeader 
@@ -168,7 +168,7 @@ export default function HeroSliders() {
             )}
             <button 
               onClick={() => {
-                setSliders(initialSliders);
+                fetchSliders();
                 setIsDirty(false);
               }}
               disabled={!isDirty || saving}

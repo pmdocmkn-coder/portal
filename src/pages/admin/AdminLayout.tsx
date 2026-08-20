@@ -24,7 +24,7 @@ import logo from '../../assets/images/logo_mkn.png'; // MKN Logo
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userRole, session } = useAuth();
+  const { userRole, session, canAccessPage } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = async () => {
@@ -33,30 +33,27 @@ export default function AdminLayout() {
     navigate('/admin/login');
   };
 
-  const navGroups = [
-    {
-      label: 'UMUM',
-      items: [
-        { name: 'Ringkasan', path: '/admin', icon: SquaresFour },
-      ]
-    },
-    {
-      label: 'PORTAL & LAYANAN',
-      items: [
-        { name: 'Kelola Portal', path: '/admin/portals', icon: FolderOpen },
-        { name: 'Kategori Layanan', path: '/admin/categories', icon: Folders },
-      ]
-    },
-    ...(userRole === 'admin' ? [{
-      label: 'PENGATURAN',
-      items: [
-        { name: 'Identitas Website', path: '/admin/appearance', icon: Palette },
-        { name: 'Slider Beranda', path: '/admin/sliders', icon: ImageSquare },
-        { name: 'Pengguna Admin', path: '/admin/users', icon: Users },
-        { name: 'Aktivitas & Log', path: '/admin/activity', icon: Clock },
-      ]
-    }] : [])
+  // All possible nav items — filtered by permission
+  const allNavItems = [
+    { name: 'Ringkasan', path: '/admin', icon: SquaresFour, page: 'dashboard', group: 'UMUM' },
+    { name: 'Kelola Portal', path: '/admin/portals', icon: FolderOpen, page: 'portals', group: 'PORTAL & LAYANAN' },
+    { name: 'Kategori Layanan', path: '/admin/categories', icon: Folders, page: 'categories', group: 'PORTAL & LAYANAN' },
+    { name: 'Identitas Website', path: '/admin/appearance', icon: Palette, page: 'appearance', group: 'PENGATURAN' },
+    { name: 'Slider Beranda', path: '/admin/sliders', icon: ImageSquare, page: 'sliders', group: 'PENGATURAN' },
+    { name: 'Pengguna Admin', path: '/admin/users', icon: Users, page: 'users', group: 'PENGATURAN' },
+    { name: 'Pengaturan Izin', path: '/admin/permissions', icon: ShieldCheck, page: 'permissions', group: 'PENGATURAN' },
+    { name: 'Aktivitas & Log', path: '/admin/activity', icon: Clock, page: 'activity', group: 'PENGATURAN' },
   ];
+
+  // Filter items by permission and group them
+  const visibleItems = allNavItems.filter(item => canAccessPage(item.page));
+  const navGroups = Object.entries(
+    visibleItems.reduce((groups, item) => {
+      if (!groups[item.group]) groups[item.group] = [];
+      groups[item.group].push(item);
+      return groups;
+    }, {} as Record<string, typeof allNavItems>)
+  ).map(([label, items]) => ({ label, items }));
 
   return (
     <div className="h-screen w-full overflow-hidden flex font-sans text-slate-900 bg-white">
@@ -122,27 +119,41 @@ export default function AdminLayout() {
           ))}
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t border-[#1e293b]">
-          <button 
-            onClick={handleLogout}
-            title="Keluar / Logout"
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between p-3'} rounded-xl hover:bg-white/5 transition-colors cursor-pointer group text-left`}
-          >
-            <div className="flex items-center gap-3">
+      {/* Sidebar Footer */}
+      <div className="p-4 border-t border-[#1e293b]">
+        <Link 
+          to="/admin/profile"
+          title="Profil Saya"
+          className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'justify-between p-3'} rounded-xl hover:bg-white/5 transition-colors cursor-pointer group text-left`}
+        >
+          <div className="flex items-center gap-3">
+            {session?.user?.user_metadata?.avatar_url ? (
+              <img 
+                src={session.user.user_metadata.avatar_url} 
+                alt="Avatar" 
+                className="w-8 h-8 rounded-full object-cover border border-slate-700 shrink-0"
+              />
+            ) : (
               <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
-                <span className="text-xs font-bold text-slate-300">JP</span>
+                <span className="text-xs font-bold text-slate-300">
+                  {((session?.user?.user_metadata?.full_name || session?.user?.email) || 'U').charAt(0).toUpperCase()}
+                </span>
               </div>
-              {!isCollapsed && (
-                <div className="overflow-hidden">
-                  <p className="text-sm font-bold text-white truncate">Jupri E. P.</p>
-                  <p className="text-xs text-slate-400 font-medium truncate">Super Admin</p>
-                </div>
-              )}
-            </div>
-            {!isCollapsed && <CaretRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors shrink-0" weight="bold" />}
-          </button>
-        </div>
+            )}
+            {!isCollapsed && (
+              <div className="overflow-hidden">
+                <p className="text-sm font-bold text-white truncate">
+                  {session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || 'Pengguna'}
+                </p>
+                <p className="text-xs text-slate-400 font-medium truncate">
+                  {userRole === 'admin' ? 'Super Admin' : 'Editor'}
+                </p>
+              </div>
+            )}
+          </div>
+          {!isCollapsed && <CaretRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors shrink-0" weight="bold" />}
+        </Link>
+      </div>
       </aside>
 
       {/* Main Content */}

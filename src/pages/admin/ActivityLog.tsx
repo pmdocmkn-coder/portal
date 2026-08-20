@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Clock, Info, WarningCircle, CheckCircle, WarningOctagon, FunnelSimple } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
@@ -44,7 +44,7 @@ export default function ActivityLog() {
   const filteredLogs = logs.filter(log => filter === 'Semua' || log.type === filter.toLowerCase());
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8">
+    <div className="animate-fade-in-up space-y-8">
       
       {/* Header */}
       <AdminHeader 
@@ -102,3 +102,4 @@ export default function ActivityLog() {
     </div>
   );
 }
+

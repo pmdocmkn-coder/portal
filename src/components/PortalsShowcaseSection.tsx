@@ -64,10 +64,10 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1280) setItemsPerPage(6); // xl screens
-      else if (window.innerWidth >= 1024) setItemsPerPage(4); // lg screens (2 cols x 2 rows fit better on right half)
-      else if (window.innerWidth >= 768) setItemsPerPage(4);
-      else setItemsPerPage(4);
+      if (window.innerWidth >= 1280) setItemsPerPage(6); // xl screens: 3 cols x 2 rows
+      else if (window.innerWidth >= 1024) setItemsPerPage(4); // lg screens: 2 cols x 2 rows
+      else if (window.innerWidth >= 768) setItemsPerPage(4); // md screens: 2 cols x 2 rows
+      else setItemsPerPage(8); // mobile: 4 cols x 2 rows (icon grid)
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -200,15 +200,32 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                  </div>
                  
                  {/* Slider Layout */}
-                 <div className="relative w-full px-8 md:px-12 lg:px-0 lg:pr-12 xl:pr-14">
-                    <div className="overflow-hidden w-full">
+                 {/* Desktop: flex row with arrows. Mobile: just the grid, no arrows */}
+                 <div className="w-full">
+                   <div className="flex items-center gap-3 w-full">
+                    {/* Left Arrow - hidden on mobile */}
+                    <div className="hidden md:flex shrink-0 w-11 items-center justify-center">
+                      {totalPages > 1 && (
+                        <button 
+                          onClick={prevPage}
+                          disabled={currentPage === 0}
+                          className="w-11 h-11 bg-white/20 hover:bg-white/30 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center rounded-full backdrop-blur-md transition-all"
+                        >
+                          <CaretLeft className="w-5 h-5 text-white" weight="bold" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Cards Grid */}
+                    <div className="overflow-hidden flex-1 min-w-0">
                       <div 
                         className="flex transition-transform duration-500 ease-in-out" 
                         style={{ transform: `translateX(-${currentPage * 100}%)` }}
                       >
                         {Array.from({ length: totalPages || 1 }).map((_, pageIndex) => (
-                          <div key={pageIndex} className="w-full shrink-0 lg:pr-2">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 w-full">
+                          <div key={pageIndex} className="w-full shrink-0">
+                            {/* Mobile: 4-col icon grid | Tablet: 2-col | Desktop: 3-col */}
+                            <div className="grid grid-cols-4 sm:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-5 w-full">
                               {filteredPortals.length > 0 ? (
                                 filteredPortals.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage).map((portal, idx) => {
                                   let displayTitle = portal.title.replace(' Portal', '');
@@ -219,22 +236,25 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
-                                      className="group relative flex flex-row items-center justify-start text-left gap-3 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 w-full"
+                                      className="group relative flex 
+                                        flex-col items-center text-center gap-2 p-3 rounded-2xl 
+                                        sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl 
+                                        bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-[#E85D44] hover:border-[#E85D44] hover:shadow-[0_8px_30px_rgba(232,93,68,0.4)] transition-all duration-300 w-full"
                                     >
                                       {/* Icon Box */}
-                                      <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'rounded-full bg-white p-1 border-2 border-white/90 shadow-sm overflow-hidden' : ''}`}>
+                                      <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'rounded-full bg-white p-1 border-2 border-white/90 shadow-sm overflow-hidden' : ''}`}>
                                         {portal.customIcon ? (
                                           <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
                                         ) : (
-                                          <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] md:text-xs font-black text-[#E85D44] bg-[#E85D44]/10">
+                                          <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black text-[#E85D44] bg-[#E85D44]/10">
                                             MKN
                                           </div>
                                         )}
                                       </div>
                 
                                       {/* Text */}
-                                      <div className="flex flex-col relative z-10 flex-grow pr-4 w-full justify-center">
-                                        <h3 className="text-sm md:text-[15px] font-bold text-white leading-[1.2] transition-colors line-clamp-2">
+                                      <div className="flex flex-col relative z-10 sm:flex-grow sm:pr-4 w-full justify-center">
+                                        <h3 className="text-[11px] leading-tight sm:text-[15px] font-bold text-white sm:leading-[1.2] transition-colors line-clamp-2">
                                           {displayTitle}
                                         </h3>
                                       </div>
@@ -252,44 +272,38 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                       </div>
                     </div>
 
-                    {/* Navigation Arrows for Slider */}
-                    {totalPages > 1 && (
-                      <>
-                        <button 
-                          onClick={prevPage}
-                          disabled={currentPage === 0}
-                          className="absolute left-0 md:left-2 lg:-left-6 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-white/20 hover:bg-white/30 disabled:opacity-0 flex items-center justify-center rounded-full backdrop-blur-md transition-all z-20"
-                        >
-                          <CaretLeft className="w-5 h-5 text-white" weight="bold" />
-                        </button>
+                    {/* Right Arrow - hidden on mobile */}
+                    <div className="hidden md:flex shrink-0 w-11 items-center justify-center">
+                      {totalPages > 1 && (
                         <button 
                           onClick={nextPage}
                           disabled={currentPage === totalPages - 1}
-                          className="absolute right-0 md:right-2 lg:right-0 xl:right-2 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-white/20 hover:bg-white/30 disabled:opacity-0 flex items-center justify-center rounded-full backdrop-blur-md transition-all z-20"
+                          className="w-11 h-11 bg-white/20 hover:bg-white/30 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center rounded-full backdrop-blur-md transition-all"
                         >
                           <CaretRight className="w-5 h-5 text-white" weight="bold" />
                         </button>
-                      </>
-                    )}
-                 </div>
-
-                 {/* Pagination Dots */}
-                 {totalPages > 1 && (
-                   <div className="w-full flex justify-center gap-2 mt-8 lg:pr-12">
-                     {Array.from({ length: totalPages }).map((_, idx) => (
-                       <button
-                         key={idx}
-                         onClick={() => setCurrentPage(idx)}
-                         className={`h-2 rounded-full transition-all duration-300 ${
-                           currentPage === idx 
-                             ? 'w-6 bg-white shadow-sm' 
-                             : 'w-2 bg-white/40 hover:bg-white/60'
-                         }`}
-                         aria-label={`Go to page ${idx + 1}`}
-                       />
-                     ))}
+                      )}
+                    </div>
                    </div>
-                 )}
+
+                   {/* Pagination Dots */}
+                   {totalPages > 1 && (
+                    <div className="w-full flex justify-center gap-2 mt-6 sm:mt-8">
+                      {Array.from({ length: totalPages }).map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setCurrentPage(idx)}
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            currentPage === idx 
+                              ? 'w-6 bg-white shadow-sm' 
+                              : 'w-2 bg-white/40 hover:bg-white/60'
+                          }`}
+                          aria-label={`Go to page ${idx + 1}`}
+                        />
+                      ))}
+                    </div>
+                   )}
+                 </div>
 
               </div>
               

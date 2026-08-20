@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../../lib/supabase';
 import { PortalSite } from '../../types';
 import { PencilSimple, Trash, Plus, ArrowUpRight, X, UploadSimple, Plugs, Info } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 import { Select } from '../../components/ui/Select';
+import { Input } from '../../components/ui/Input';
+import { Textarea } from '../../components/ui/Textarea';
 import { useAuth } from '../../contexts/AuthContext';
 import { AdminHeader } from '../../components/ui/AdminHeader';
 
@@ -25,7 +28,7 @@ const defaultFormData: PortalFormData = {
 };
 
 export default function PortalsManager() {
-  const { userRole } = useAuth();
+  const { userRole, hasPermission } = useAuth();
   const [portals, setPortals] = useState<PortalSite[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -174,7 +177,8 @@ export default function PortalsManager() {
       category: formData.category,
       url: formData.url,
       custom_image: formData.customIcon,
-      description: formData.description
+      description: formData.description,
+      client_or_type: 'Client' // Must match DB check constraint: 'Client', 'Personal', or 'Curated'
     };
     
     const { data: userData } = await supabase.auth.getUser();
@@ -224,19 +228,21 @@ export default function PortalsManager() {
   );
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="animate-fade-in-up space-y-8">
       <div className="flex flex-col gap-6 mb-8">
         <AdminHeader 
           title="Kelola Portal" 
           subtitle="Kelola tautan portal dan integrasi layanan"
           action={
-            <button 
-              onClick={() => handleOpenModal()}
-              className="flex items-center gap-2 bg-[#1B3A6B] text-white px-5 py-2.5 rounded-lg font-medium tracking-wide shadow-[0_4px_14px_0_rgba(27,58,107,0.39)] hover:shadow-[0_6px_20px_rgba(27,58,107,0.23)] hover:-translate-y-[1px] active:scale-[0.98] transition-all duration-300"
-            >
-              <Plus weight="bold" />
-              Tambah Portal
-            </button>
+            hasPermission('portals', 'create') && (
+              <button 
+                onClick={() => handleOpenModal()}
+                className="flex items-center gap-2 bg-[#1B3A6B] text-white px-5 py-2.5 rounded-lg font-medium tracking-wide shadow-[0_4px_14px_0_rgba(27,58,107,0.39)] hover:shadow-[0_6px_20px_rgba(27,58,107,0.23)] hover:-translate-y-[1px] active:scale-[0.98] transition-all duration-300"
+              >
+                <Plus weight="bold" />
+                Tambah Portal
+              </button>
+            )
           }
         />
 
@@ -280,12 +286,14 @@ export default function PortalsManager() {
             </div>
             <h3 className="text-lg font-medium text-slate-900 mb-1">Belum Ada Portal</h3>
             <p className="text-slate-500 text-sm text-center mb-6">Anda belum menambahkan tautan portal apapun. Mulai dengan menambahkan integrasi pertama.</p>
-            <button 
-              onClick={() => handleOpenModal()}
-              className="text-[#1B3A6B] font-medium hover:underline flex items-center gap-2"
-            >
-              <Plus weight="bold" /> Tambah Portal
-            </button>
+            {hasPermission('portals', 'create') && (
+              <button 
+                onClick={() => handleOpenModal()}
+                className="text-[#1B3A6B] font-medium hover:underline flex items-center gap-2"
+              >
+                <Plus weight="bold" /> Tambah Portal
+              </button>
+            )}
           </div>
         )}
         {filteredPortals.length === 0 && !loading && (
@@ -326,14 +334,16 @@ export default function PortalsManager() {
                   >
                     <Info size={24} weight="bold" />
                   </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleOpenModal(portal); }}
-                    className="w-12 h-12 flex items-center justify-center bg-white text-slate-700 hover:text-[#1B3A6B] rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all"
-                    title="Edit Portal"
-                  >
-                    <PencilSimple size={24} weight="bold" />
-                  </button>
-                  {userRole === 'admin' && (
+                  {hasPermission('portals', 'update') && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleOpenModal(portal); }}
+                      className="w-12 h-12 flex items-center justify-center bg-white text-slate-700 hover:text-[#1B3A6B] rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all"
+                      title="Edit Portal"
+                    >
+                      <PencilSimple size={24} weight="bold" />
+                    </button>
+                  )}
+                  {hasPermission('portals', 'delete') && (
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleDelete(portal.id); }}
                       className="w-12 h-12 flex items-center justify-center bg-white text-red-500 hover:text-red-600 rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all"
@@ -355,11 +365,11 @@ export default function PortalsManager() {
         ))}
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={handleCloseModal}></div>
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 overflow-y-auto custom-scrollbar">
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={handleCloseModal}></div>
           <div 
-            className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transform transition-all border border-white/20"
+            className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col relative transform transition-all border border-white/20 my-auto"
             style={{ animation: 'springBounce 0.3s ease-out' }}
           >
             <div className="flex justify-between items-center p-6 border-b border-slate-100">
@@ -369,16 +379,16 @@ export default function PortalsManager() {
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+            <div className="p-6">
               <form id="portal-form" onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Nama Portal</label>
-                    <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]/20 focus:border-[#1B3A6B] transition-all" placeholder="contoh: HRIS System" />
+                    <Input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="contoh: HRIS System" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Tautan URL</label>
-                    <input required type="url" value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]/20 focus:border-[#1B3A6B] transition-all" placeholder="https://" />
+                    <Input required type="url" value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} placeholder="https://" />
                   </div>
                 </div>
 
@@ -395,7 +405,7 @@ export default function PortalsManager() {
 
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Deskripsi</label>
-                    <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]/20 focus:border-[#1B3A6B] transition-all resize-none" rows={3} placeholder="Deskripsi singkat tentang portal ini..."></textarea>
+                    <Textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} rows={3} placeholder="Deskripsi singkat tentang portal ini..." />
                 </div>
 
                 <div className="pt-2">
@@ -406,40 +416,40 @@ export default function PortalsManager() {
                   >
                     <p className="text-sm font-medium text-slate-700 mb-4">Ikon Portal</p>
                     {formData.customIcon ? (
-                      <div className="relative w-20 h-20 rounded-xl bg-white shadow-sm ring-1 ring-slate-900/5 flex items-center justify-center mb-4">
-                        <img src={formData.customIcon} alt="Icon" className="w-12 h-12 object-contain" />
+                      <div className="flex flex-col items-center">
+                        <img src={formData.customIcon} alt="Icon Preview" className="w-20 h-20 object-contain mb-4 bg-white p-2 rounded-xl shadow-sm border border-slate-100" />
+                        <span className="text-xs text-[#1B3A6B] font-medium bg-[#1B3A6B]/10 px-3 py-1 rounded-full">Ganti Gambar</span>
                       </div>
                     ) : (
-                      <div className="h-20 w-20 bg-white rounded-xl shadow-sm ring-1 ring-slate-900/5 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                        <UploadSimple size={32} className="text-[#1B3A6B]" weight="bold" />
+                      <div className="flex flex-col items-center">
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 mb-4 group-hover:scale-110 transition-transform">
+                          <UploadSimple className="w-8 h-8 text-slate-400 group-hover:text-[#1B3A6B] transition-colors" />
+                        </div>
+                        <p className="text-sm text-slate-500 max-w-[200px]">Seret gambar ke sini atau klik untuk memilih file</p>
+                        <p className="text-xs text-slate-400 mt-2">Maks. 2MB (PNG, JPG, SVG)</p>
                       </div>
                     )}
-                    <span className="text-sm font-medium text-[#1B3A6B] hover:text-[#2B6CB0] transition-colors">
-                      Seret & Lepas atau Klik untuk Unggah SVG/PNG
-                    </span>
-                    <input type="file" className="hidden" accept="image/*" onChange={onFileChange} />
+                    <input type="file" accept="image/*" onChange={onFileChange} className="hidden" />
                   </label>
                 </div>
               </form>
             </div>
             
-            <div className="p-6 border-t border-slate-100 bg-slate-50/80 flex justify-end gap-3 rounded-b-2xl">
-              <button onClick={handleCloseModal} type="button" className="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 rounded-xl transition-colors">Batal</button>
-              <button 
-                type="submit" 
-                form="portal-form" 
-                disabled={isSubmitting}
-                className="px-5 py-2.5 text-sm font-medium bg-[#1B3A6B] text-white rounded-xl shadow-[0_2px_10px_rgba(27,58,107,0.2)] hover:shadow-[0_4px_15px_rgba(27,58,107,0.3)] hover:-translate-y-[1px] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none transition-all"
-              >
+            <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex gap-4 rounded-b-2xl">
+              <button onClick={handleCloseModal} className="flex-1 py-3 px-4 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-white transition-colors">
+                Batal
+              </button>
+              <button form="portal-form" type="submit" disabled={isSubmitting} className="flex-1 py-3 px-4 rounded-xl bg-[#1B3A6B] hover:bg-[#152e55] text-white font-semibold transition-colors disabled:opacity-50">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan Portal'}
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {viewPortal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {viewPortal && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setViewPortal(null)}></div>
           <div 
             className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col relative transform transition-all border border-white/20"
@@ -500,7 +510,8 @@ export default function PortalsManager() {
               </a>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
       
       <style>{`
@@ -525,3 +536,4 @@ export default function PortalsManager() {
     </div>
   );
 }
+
