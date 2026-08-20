@@ -106,7 +106,7 @@ export const PortalGallerySection: React.FC<PortalGallerySectionProps> = ({ onSe
                 {/* Image Media Preview */}
                 <div className="relative aspect-video w-full bg-[#F7F8FA] overflow-hidden border-b border-[#E2E8F0]">
                   <img
-                    src={site.previewImage || site.customImage || `https://image.thum.io/get/width/1280/crop/800/noanimate/${site.url}`}
+                    src={site.previewImage || site.customImage || `https://s0.wp.com/mshots/v1/${encodeURIComponent(site.url)}?w=800`}
                     alt={site.title}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

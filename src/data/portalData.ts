@@ -6,6 +6,7 @@ import videoOnward from '../assets/images/onward.mp4';
 import hsesclassImg from '../assets/images/hsesclass.png';
 import msdclassImg from '../assets/images/msdclass.png';
 import cctvmknImg from '../assets/images/cctvmkn.png';
+import iconPm from '../assets/images/icon_pm.png';
 
 export interface CompanyInfo {
   name: string;
@@ -26,8 +27,8 @@ export const COMPANY_INFO: CompanyInfo = {
   subtagline: 'Satu pintu akses terpadu untuk seluruh sistem operasional, portal manajemen, dan layanan digital MKN.',
   established: '2021',
   location: 'Jakarta, Indonesia',
-  totalProjects: '7 Portal',
-  activePortals: '7 Portal Live',
+  totalProjects: '8 Portal',
+  activePortals: '8 Portal Live',
   clientCount: '5 Kategori',
   satisfactionRate: '99.99%',
   authType: 'SSO Enforced'
@@ -46,6 +47,7 @@ export interface MarqueeItem {
   statusColor: 'emerald' | 'amber' | 'red';
   customImage?: string;
   previewImage?: string;
+  customIcon?: string;
 }
 
 export const MARQUEE_PORTALS: MarqueeItem[] = [
@@ -59,7 +61,8 @@ export const MARQUEE_PORTALS: MarqueeItem[] = [
     tags: ['MKN Smart', 'Operasional', 'Live Web', 'Realtime'],
     description: 'Portal resmi MKN Smart untuk manajemen operasional cerdas, pemantauan sistem, dan integrasi layanan internal.',
     status: 'Active',
-    statusColor: 'emerald'
+    statusColor: 'emerald',
+    customIcon: logoMkn
   },
   {
     id: 'mkn-pm-ops-portal',
@@ -71,7 +74,8 @@ export const MARQUEE_PORTALS: MarqueeItem[] = [
     tags: ['Preventive Maintenance', 'PM Ops', 'Live Web', 'Tracking'],
     description: 'Portal pemeliharaan preventif (Preventive Maintenance Ops) dan sistem operasional harian untuk inspeksi, perawatan berkala, dan pemantauan perangkat.',
     status: 'Active',
-    statusColor: 'emerald'
+    statusColor: 'emerald',
+    customIcon: iconPm
   },
   {
     id: 'mkn-erp-portal',
@@ -137,11 +141,23 @@ export const MARQUEE_PORTALS: MarqueeItem[] = [
     status: 'Active',
     statusColor: 'amber',
     previewImage: cctvmknImg
+  },
+  {
+    id: 'mkn-erp-approval',
+    title: 'MKN ERP Approval Worksheet',
+    company: 'MKN ERP System',
+    gif: 'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
+    url: 'https://mkn-erp.my.id/',
+    category: 'Manajemen & Analitik',
+    tags: ['ERP System', 'Approval', 'Worksheet', 'Manajemen'],
+    description: 'Sistem persetujuan (approval) ERP MKN untuk memproses dan meninjau worksheet, dokumen, dan pengajuan operasional.',
+    status: 'Active',
+    statusColor: 'emerald'
   }
 ];
 
-export const MARQUEE_ROW_1 = [MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2], MARQUEE_PORTALS[3], MARQUEE_PORTALS[4], MARQUEE_PORTALS[5], MARQUEE_PORTALS[6]];
-export const MARQUEE_ROW_2 = [MARQUEE_PORTALS[3], MARQUEE_PORTALS[4], MARQUEE_PORTALS[5], MARQUEE_PORTALS[6], MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2]];
+export const MARQUEE_ROW_1 = [MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2], MARQUEE_PORTALS[3], MARQUEE_PORTALS[4], MARQUEE_PORTALS[5], MARQUEE_PORTALS[6], MARQUEE_PORTALS[7]];
+export const MARQUEE_ROW_2 = [MARQUEE_PORTALS[4], MARQUEE_PORTALS[5], MARQUEE_PORTALS[6], MARQUEE_PORTALS[7], MARQUEE_PORTALS[0], MARQUEE_PORTALS[1], MARQUEE_PORTALS[2], MARQUEE_PORTALS[3]];
 
 export const COMPANY_SOLUTIONS: ServiceItem[] = [
   {

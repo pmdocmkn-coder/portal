@@ -1,214 +1,387 @@
-import React, { useState } from 'react';
-import { Magnet } from './ui/Magnet';
-import { FadeIn } from './ui/FadeIn';
-import { MKNLogo } from './ui/MKNLogo';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { ArrowRight, Code2, LayoutGrid, ChevronLeft, ChevronRight, Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv } from 'lucide-react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import { LogoIntroModal } from './ui/LogoIntroModal';
-import { VideoModal } from './ui/VideoModal';
-import { COMPANY_INFO, DECORATIVE_IMAGES } from '../data/portalData';
-import { Shield, Sparkles, Building2, Globe, Layers, ArrowRight, Play } from 'lucide-react';
+import { FadeIn } from './ui/FadeIn';
+import { MarqueeItem } from '../data/portalData';
+
+const getIconForPortal = (index: number, className: string = "") => {
+  const icons = [Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv];
+  const Icon = icons[index % icons.length];
+  return <Icon className={className} />;
+};
 
 interface HeroSectionProps {
   onOpenContact: () => void;
-  onNavigate: (sectionId: string) => void;
+  onNavigate: (page: 'overview' | 'gallery' | 'projects') => void;
+  onExpandPortals?: () => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavigate }) => {
-  const [isIntroOpen, setIsIntroOpen] = useState(false);
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+// LIGHT THEME COLORS based on Synergy MKN Logo (Coral, Cyan, Deep Blue)
+const CARD_THEMES = [
+  { // Coral
+    outerRing: 'ring-[#E85D44]/20',
+    innerRing: 'bg-[#E85D44]/10 text-[#E85D44]',
+    btnBg: 'bg-[#E85D44]/10',
+    btnHover: 'group-hover:bg-[#E85D44] group-hover:text-white',
+    btnText: 'text-[#E85D44]'
+  },
+  { // Cyan
+    outerRing: 'ring-[#38BDF8]/20',
+    innerRing: 'bg-[#38BDF8]/10 text-[#38BDF8]',
+    btnBg: 'bg-[#38BDF8]/10',
+    btnHover: 'group-hover:bg-[#38BDF8] group-hover:text-white',
+    btnText: 'text-[#38BDF8]'
+  },
+  { // Deep Blue
+    outerRing: 'ring-[#1E3A8A]/20',
+    innerRing: 'bg-[#1E3A8A]/10 text-[#1E3A8A]',
+    btnBg: 'bg-[#1E3A8A]/10',
+    btnHover: 'group-hover:bg-[#1E3A8A] group-hover:text-white',
+    btnText: 'text-[#1E3A8A]'
+  },
+  { // Soft Emerald
+    outerRing: 'ring-emerald-500/20',
+    innerRing: 'bg-emerald-500/10 text-emerald-600',
+    btnBg: 'bg-emerald-500/10',
+    btnHover: 'group-hover:bg-emerald-500 group-hover:text-white',
+    btnText: 'text-emerald-600'
+  },
+  { // Purple
+    outerRing: 'ring-purple-500/20',
+    innerRing: 'bg-purple-500/10 text-purple-600',
+    btnBg: 'bg-purple-500/10',
+    btnHover: 'group-hover:bg-purple-500 group-hover:text-white',
+    btnText: 'text-purple-600'
+  },
+];
 
+const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number, portal: MarqueeItem, theme: typeof CARD_THEMES[0], themeIdx: number, idx: number }) => {
+  const isCircle = true; // Always use circle to match reference nicely, or keep the alternating logic. Let's make it always circle.
+  let displayTitle = portal.title.replace(' Portal', '');
+  
   return (
-    <div className="relative bg-[#F7F8FA]">
-      {/* 1. STICKY TOP NAVBAR (z-50 ensures menu is always clickable) */}
-      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] shadow-xs transition-all">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-3.5 flex items-center justify-between gap-4">
-          {/* Official Animated MKN Logo (Click to play 3D intro modal) */}
-          <div className="cursor-pointer" onClick={() => setIsIntroOpen(true)} title="Klik untuk putar 3D Intro Motion Logo">
-            <MKNLogo size="md" showSubtext={true} interactive={true} />
-          </div>
-
-          {/* Navigation Menu Links */}
-          <nav className="hidden lg:flex items-center gap-1.5 bg-[#F7F8FA] p-1.5 rounded-full border border-[#E2E8F0] shadow-xs">
-            <button
-              onClick={() => setIsIntroOpen(true)}
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-[#FF5500] bg-orange-50 border border-orange-200 hover:bg-orange-100 transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <Play className="w-3.5 h-3.5 fill-[#FF5500]" />
-              Intro 3D Logo
-            </button>
-            <button
-              onClick={() => onNavigate('gallery')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-[#1B3A6B] bg-white border border-[#E2E8F0] shadow-xs hover:text-[#D94F2B] transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
-              Direktori Portal Live
-            </button>
-            <button
-              onClick={() => onNavigate('overview')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-[#1A202C] hover:text-[#1B3A6B] hover:bg-white transition-all cursor-pointer"
-            >
-              Tentang MKN
-            </button>
-            <button
-              onClick={() => onNavigate('projects')}
-              className="px-4 py-2 rounded-full text-xs font-bold text-[#1A202C] hover:text-[#1B3A6B] hover:bg-white transition-all cursor-pointer"
-            >
-              Portal Utama
-            </button>
-          </nav>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onOpenContact}
-              className="bg-[#1B3A6B] hover:bg-[#2B6CB0] text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-            >
-              <span>Hubungi Kami</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#E86547]" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* 2. MAIN HERO SECTION WITH SAFE MARGIN BOUNDARIES */}
-      <section className="relative min-h-[85vh] flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#F7F8FA] via-white to-[#F7F8FA] select-none pt-8 pb-12 border-b border-[#E2E8F0]">
-        {/* Background Decorative Grid */}
-        <div className="absolute inset-0 bg-[radial-gradient(#2B6CB0_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
-
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 my-auto py-6 z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left Column: Text & Call to Actions */}
-            <div className="lg:col-span-7 text-left space-y-6">
-              <FadeIn y={20} delay={0.1} duration={0.6}>
-                <div className="inline-flex items-center gap-2 bg-[#1B3A6B]/10 text-[#1B3A6B] border border-[#1B3A6B]/20 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide">
-                  <Shield className="w-4 h-4 text-[#D94F2B]" />
-                  MKN Portal Hub — Web Portal Terpadu
-                </div>
-              </FadeIn>
-
-              <FadeIn y={30} delay={0.2} duration={0.7}>
-                <h1 className="hero-navy-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]">
-                  MKN PORTAL HUB
-                </h1>
-              </FadeIn>
-
-              <FadeIn y={30} delay={0.3} duration={0.7}>
-                <p className="text-base sm:text-lg text-[#718096] max-w-2xl font-normal leading-relaxed">
-                  Pusat akses resmi dan direktori web portal MKN. Temukan seluruh tautan platform operasional, sistem manajemen, direktori layanan, dan portal internal perusahaan dalam satu pintu.
-                </p>
-              </FadeIn>
-
-              {/* Corporate Stats Cards */}
-              <FadeIn y={30} delay={0.4} duration={0.7}>
-                <div className="grid grid-cols-2 gap-4 pt-2 max-w-md">
-                  <div className="bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-xs">
-                    <div className="flex items-center gap-2 text-[#2B6CB0] mb-1">
-                      <Building2 className="w-4 h-4" />
-                      <span className="text-xs font-bold text-[#718096]">Portal Terintegrasi</span>
-                    </div>
-                    <span className="text-2xl font-black text-[#1B3A6B]">{COMPANY_INFO.activePortals}</span>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-xs">
-                    <div className="flex items-center gap-2 text-[#D94F2B] mb-1">
-                      <Globe className="w-4 h-4" />
-                      <span className="text-xs font-bold text-[#718096]">Kategori Sistem</span>
-                    </div>
-                    <span className="text-2xl font-black text-[#1B3A6B]">{COMPANY_INFO.clientCount}</span>
-                  </div>
-                </div>
-              </FadeIn>
-
-              {/* CTA Buttons */}
-              <FadeIn y={30} delay={0.5} duration={0.7}>
-                <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <button
-                    onClick={() => onNavigate('gallery')}
-                    className="bg-[#D94F2B] hover:bg-[#E86547] text-white font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer text-sm"
-                  >
-                    <Sparkles className="w-5 h-5 text-yellow-300" />
-                    Jelajahi Portal Perusahaan
-                  </button>
-                </div>
-              </FadeIn>
-            </div>
-
-            {/* Right Column: Safely Bounded 3D Card */}
-            <div className="lg:col-span-5 relative flex justify-center pt-4 lg:pt-0">
-              <FadeIn y={40} delay={0.4} duration={0.8} className="w-full">
-                <Magnet
-                  padding={30}
-                  strength={1.5}
-                  activeTransition="transform 0.3s ease-out"
-                  inactiveTransition="transform 0.6s ease-in-out"
-                  className="w-full max-w-[360px] sm:max-w-[400px] mx-auto"
-                >
-                  <div
-                    className="relative mx-auto w-full cursor-pointer group"
-                    onClick={() => setIsVideoModalOpen(true)}
-                    title="Klik untuk memutar video MKN Onwards"
-                  >
-                    {/* Decorative Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#1B3A6B] to-[#D94F2B] rounded-3xl blur-xl opacity-15 transform scale-95" />
-
-                    {/* Main Card Graphic */}
-                    <div className="relative bg-white/95 backdrop-blur-xl border border-[#E2E8F0] p-5 rounded-3xl shadow-xl overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]">
-                      <div className="relative">
-                        <img
-                          src={DECORATIVE_IMAGES.gifOnward}
-                          alt="MKN Onwards Animation"
-                          className="w-full h-auto max-h-[280px] object-contain rounded-2xl"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 rounded-2xl flex items-center justify-center z-10">
-                          <div className="w-16 h-16 rounded-full bg-white/90 shadow-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <Play className="w-8 h-8 text-[#1B3A6B] fill-[#1B3A6B] ml-1" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-[#1B3A6B] to-[#D94F2B] border border-[#E2E8F0]">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[11px] font-extrabold text-white uppercase tracking-wider">
-                            MKN ONWARDS
-                          </span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/20 text-white backdrop-blur-sm">
-                            MOTION
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-white/90 leading-relaxed font-medium">
-                          Transformasi Digital menuju era baru kemitraan dan inovasi berkelanjutan.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Magnet>
-              </FadeIn>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Status Bar */}
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-[#718096] border-t border-[#E2E8F0]/80 z-10">
-          <span className="font-semibold text-[#1B3A6B]">
-            © 2026 MKN DIGITAL MOTION PORTAL. ALL RIGHTS RESERVED.
-          </span>
-          <span className="flex items-center gap-2 mt-2 sm:mt-0 font-medium text-[#D94F2B]">
-            <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
-            Interactive Motion Directory Ready
-          </span>
-        </div>
-      </section>
-
-      {/* 3D Intro Video Modal */}
-      <LogoIntroModal isOpen={isIntroOpen} onClose={() => setIsIntroOpen(false)} />
-
-      {/* Onwards Video Modal */}
-      <VideoModal
-        isOpen={isVideoModalOpen}
-        onClose={() => setIsVideoModalOpen(false)}
-        videoUrl={DECORATIVE_IMAGES.videoOnward}
-        title="MKN Onwards"
-      />
-    </div>
+    <a
+      href={portal.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
+      className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none w-full max-w-[280px]"
+    >
+      <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
+         {portal.customIcon ? (
+           <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
+         ) : (
+           <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full text-[10px] sm:text-xs font-black`}>
+             {getIconForPortal(themeIdx, `w-5 h-5 md:w-6 md:h-6`)}
+           </div>
+         )}
+      </div>
+      <div className="flex flex-col relative z-10 sm:flex-grow sm:pr-4 w-full justify-center">
+         <h3 className="text-[11px] leading-tight sm:text-[13px] md:text-[15px] font-bold text-white sm:leading-snug line-clamp-2 drop-shadow-sm">{displayTitle}</h3>
+      </div>
+    </a>
   );
 };
 
+
+import { supabase } from '../lib/supabase';
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavigate, onExpandPortals }) => {
+  const [isIntroOpen, setIsIntroOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [bgImageIdx, setBgImageIdx] = useState(0);
+  const [heroImages, setHeroImages] = useState<string[]>([]);
+  const [siteSettings, setSiteSettings] = useState({
+    portal_name: '',
+    hero_title: '',
+    hero_subtitle: '',
+    hero_image_url: '',
+    logo_url: ''
+  });
+  const [portals, setPortals] = useState<MarqueeItem[]>([]);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const [settingsRes, slidersRes, portalsRes] = await Promise.all([
+        supabase.from('site_settings').select('*').eq('id', 1).single(),
+        supabase.from('hero_sliders').select('image_url').order('display_order', { ascending: true }),
+        supabase.from('portal_items').select('*').order('created_at', { ascending: false })
+      ]);
+
+      if (settingsRes.data) {
+        setSiteSettings(prev => ({
+          ...prev,
+          portal_name: settingsRes.data.portal_name || prev.portal_name,
+          hero_title: settingsRes.data.hero_title || prev.hero_title,
+          hero_subtitle: settingsRes.data.hero_subtitle || prev.hero_subtitle,
+          hero_image_url: settingsRes.data.hero_image_url || '',
+          logo_url: settingsRes.data.logo_url || ''
+        }));
+      }
+
+      if (slidersRes.data && slidersRes.data.length > 0) {
+        setHeroImages(slidersRes.data.map(item => item.image_url));
+      } else {
+        setHeroImages([]);
+      }
+
+      if (portalsRes.data && portalsRes.data.length > 0) {
+        // Map database portal items to MarqueeItem interface if needed
+        const mappedPortals = portalsRes.data.map((item: any) => ({
+          ...item,
+          clientOrType: item.client_or_type,
+          customImage: item.custom_image,
+          customIcon: item.custom_image // The UI uses customIcon
+        }));
+        setPortals(mappedPortals as MarqueeItem[]);
+      }
+      
+      setIsLoading(false);
+    };
+
+    fetchSettings();
+
+    const portalsSubscription = supabase
+      .channel('public:portal_items')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'portal_items' }, () => {
+        fetchSettings();
+      })
+      .subscribe();
+
+    const slidersSubscription = supabase
+      .channel('public:hero_sliders')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hero_sliders' }, () => {
+        fetchSettings();
+      })
+      .subscribe();
+
+    const settingsSubscription = supabase
+      .channel('public:site_settings')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, () => {
+        fetchSettings();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(portalsSubscription);
+      supabase.removeChannel(slidersSubscription);
+      supabase.removeChannel(settingsSubscription);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (heroImages.length === 0) return;
+    const timer = setInterval(() => {
+      setBgImageIdx((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [heroImages]);
+
+
+
+  const filteredPortals = useMemo(() => {
+    if (!searchQuery) return portals;
+    const lowerQuery = searchQuery.toLowerCase();
+    return portals.filter(p =>
+      p.title.toLowerCase().includes(lowerQuery) ||
+      (p.description && p.description.toLowerCase().includes(lowerQuery))
+    );
+  }, [searchQuery, portals]);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -340, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 340, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div id="home" className="relative bg-[#F8FAFC] min-h-screen text-slate-900 font-sans selection:bg-[#3B82F6] selection:text-white flex flex-col overflow-hidden">
+      
+      {/* SVG Filter for Logo */}
+      <svg width="0" height="0" className="absolute pointer-events-none" style={{ visibility: 'hidden' }}>
+        <filter id="mkn-logo-filter" colorInterpolationFilters="sRGB">
+          <feColorMatrix type="matrix" values="
+            0.999 -2.017 -1.000 0 1
+           -0.001 -1.017 -1.000 0 1
+           -1.367  1.069 -1.000 0 1
+            0      0      0     1 0
+          " />
+        </filter>
+      </svg>
+      {/* Background Image Slider */}
+      {heroImages.map((img, idx) => (
+        <div 
+          key={img + idx}
+          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${idx === bgImageIdx ? 'opacity-100' : 'opacity-0'} pointer-events-none`}
+          style={{ backgroundImage: `url(${img})` }}
+        />
+      ))}
+      
+
+      {/* Seamless transition into the Dark Stats Section */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#2B3F56] via-transparent to-transparent pointer-events-none" />
+
+      {/* Top Scrim (Dark) to ensure white text is always readable */}
+      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/50 via-black/20 to-transparent pointer-events-none" />
+
+      {/* HEADER */}
+      <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-slate-200/60' : 'bg-transparent border-transparent'}`}>
+        <div className="max-w-[1600px] mx-auto px-6 h-24 flex items-center justify-between">
+          
+          {/* Logo Container */}
+          <div 
+            className={`flex items-center cursor-pointer group transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+            onClick={() => setIsIntroOpen(true)}
+          >
+            {siteSettings.logo_url ? (
+              <div className="w-auto h-16 md:h-20 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <img 
+                  src={siteSettings.logo_url} 
+                  alt="Logo" 
+                  className="max-h-full object-contain transition-all duration-300" 
+                  style={!isScrolled ? { filter: 'url(#mkn-logo-filter) drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' } : {}}
+                />
+              </div>
+            ) : (
+              <div className="w-auto h-16 md:h-20 flex items-center justify-center p-1 group-hover:scale-105 transition-transform overflow-hidden">
+                <img 
+                  src="/src/assets/images/logo_mkn.png" 
+                  alt="MKN Logo" 
+                  className="max-h-full object-contain transition-all duration-300" 
+                  style={!isScrolled ? { filter: 'url(#mkn-logo-filter) drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' } : {}} 
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Navigation Container */}
+          <nav className="hidden md:flex items-center gap-8">
+            <button 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
+              className={`relative text-[13px] font-bold uppercase tracking-wider transition-all duration-300 py-2 group ${isScrolled ? 'text-slate-600 hover:text-[#233B8E]' : 'text-white/90 hover:text-white'}`}
+            >
+              Beranda
+              <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] rounded-full group-hover:w-full transition-all duration-300 ease-out ${isScrolled ? 'bg-[#233B8E]' : 'bg-white'}`} />
+            </button>
+            <button 
+              onClick={onExpandPortals} 
+              className={`relative text-[13px] font-bold uppercase tracking-wider transition-all duration-300 py-2 group ${isScrolled ? 'text-[#E05A44] hover:text-[#c44935]' : 'text-white/90 hover:text-white'}`}
+            >
+              Eksplorasi Portal
+              <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] rounded-full group-hover:w-full transition-all duration-300 ease-out ${isScrolled ? 'bg-[#E05A44]' : 'bg-white'}`} />
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* MAIN CONTENT */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-[1600px] mx-auto px-6 pt-32 pb-24">
+        <div className="w-full flex flex-col items-center justify-center min-h-[50vh] mt-[-40px]">
+          
+          {/* Main Content */}
+          <div className={`w-full max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 px-4 transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+            <FadeIn y={30} duration={0.8} className="w-full mb-8">
+              
+              <h1 className="text-5xl md:text-7xl lg:text-7xl font-black tracking-tight mb-6 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 leading-[1.2]">
+                <span 
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-[#E05A44] via-[#2BA5D4] to-[#233B8E] pb-2 drop-shadow-xl"
+                  style={{ 
+                    WebkitTextStroke: '2px white'
+                  }}
+                >
+                  {siteSettings.hero_title}
+                </span>
+              </h1>
+              
+              <p 
+                className="text-lg md:text-xl text-white max-w-2xl mx-auto leading-relaxed font-semibold drop-shadow-md"
+                style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))' }}
+              >
+                {siteSettings.hero_subtitle}
+              </p>
+            </FadeIn>
+
+            {/* Search Bar */}
+            <FadeIn y={30} delay={0.2} duration={0.8} className="w-full max-w-2xl mx-auto px-4 mt-2 mb-12">
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none z-10">
+                  <MagnifyingGlass weight="bold" className="h-5 w-5 text-white/60 group-focus-within:text-white transition-colors" />
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari aplikasi atau layanan..."
+                  className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-4 pl-16 pr-6 text-white placeholder-white/70 focus:outline-none focus:bg-white/20 focus:border-white/40 focus:ring-4 focus:ring-white/10 transition-all shadow-lg text-base font-medium"
+                />
+              </div>
+            </FadeIn>
+          </div>
+
+          {/* Carousel Section */}
+          <FadeIn y={40} delay={0.3} duration={1} className="w-full relative">
+            {isLoading ? (
+              <div className="h-[200px] w-full max-w-6xl mx-auto" />
+            ) : filteredPortals.length > 0 ? (
+              <div className="w-full relative flex justify-center px-4">
+                {/* Centered Grid Container */}
+                <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-5 mx-auto w-full max-w-6xl justify-items-center place-content-center">
+                  {filteredPortals.slice(0, 8).map((portal, idx) => {
+                    const themeIdx = portals.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
+                    const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
+                    return (
+                      <PortalAppItem key={`${portal.id}-${idx}`} portal={portal} theme={theme} themeIdx={themeIdx} idx={idx} />
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="py-24 text-center bg-white rounded-3xl border border-slate-200 shadow-sm w-full max-w-2xl mx-auto px-6">
+                <p className="text-slate-500 text-lg font-medium">Tidak ada aplikasi yang sesuai dengan "{searchQuery}"</p>
+              </div>
+            )}
+          </FadeIn>
+
+          {/* Lihat Semua Portal Button */}
+          <FadeIn y={20} delay={0.5} duration={1}>
+            <button 
+              onClick={onExpandPortals}
+              className="mt-8 px-8 py-3.5 rounded-full border border-white/20 bg-white/10 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-md"
+            >
+              Lihat Semua Portal 
+              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1 stroke-[3]" />
+            </button>
+          </FadeIn>
+
+        </div>
+      </main>
+
+      <LogoIntroModal isOpen={isIntroOpen} onClose={() => setIsIntroOpen(false)} />
+      
+      {/* Hide Webkit Scrollbar */}
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
+  );
+};
