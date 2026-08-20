@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { ShieldCheck, Plus, Trash, PencilSimple, Key } from '@phosphor-icons/react';
+import { ShieldCheck, Plus, Trash, PencilSimple, Key, UserPlus } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
+import { AdminHeader } from '../../components/ui/AdminHeader';
 
 export default function Users() {
   const [users, setUsers] = useState<any[]>([]);
@@ -76,22 +77,21 @@ export default function Users() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[32px] font-bold text-slate-900 tracking-tight mb-1">Pengguna Admin</h1>
-          <p className="text-slate-500 font-medium text-sm">Kelola akses dan peran pengguna di dalam sistem portal</p>
-        </div>
-        
-        <button 
-          onClick={() => {
-            setFormData({ email: '', password: '', role: 'admin' });
-            setIsModalOpen(true);
-          }}
-          className="flex items-center gap-2 bg-[#0f172a] hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" weight="bold" /> Tambah Admin
-        </button>
-      </div>
+      <AdminHeader 
+        title="Pengguna Admin" 
+        subtitle="Kelola akses dan peran pengguna di dalam sistem portal"
+        action={
+          <button 
+            onClick={() => {
+              setFormData({ email: '', password: '', role: 'admin' });
+              setIsModalOpen(true);
+            }}
+            className="flex items-center gap-2 bg-[#0f172a] hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+          >
+            <UserPlus className="w-4 h-4" weight="bold" /> Tambah Pengguna
+          </button>
+        }
+      />
 
       <div className="bg-white rounded-[16px] border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (

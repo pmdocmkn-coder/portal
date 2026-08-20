@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabase';
 import { Clock, Info, WarningCircle, CheckCircle, WarningOctagon, FunnelSimple } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 
+import { AdminHeader } from '../../components/ui/AdminHeader';
+
 export default function ActivityLog() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,11 +18,8 @@ export default function ActivityLog() {
     setLoading(true);
     // Fetch logs with user data
     const { data, error } = await supabase
-      .from('activity_logs')
-      .select(`
-        *,
-        users:user_id(email)
-      `)
+      .from('activity_logs_with_users')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
 
@@ -48,26 +47,25 @@ export default function ActivityLog() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[32px] font-bold text-slate-900 tracking-tight mb-1">Aktivitas & Log</h1>
-          <p className="text-slate-500 font-medium text-sm">Rekam jejak seluruh perubahan dan event di dalam sistem</p>
-        </div>
-        
-        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
-          {['Semua', 'Info', 'Success', 'Warning', 'Error'].map(t => (
-            <button
-              key={t}
-              onClick={() => setFilter(t)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
-                filter === t ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AdminHeader 
+        title="Aktivitas & Log" 
+        subtitle="Rekam jejak seluruh perubahan dan event di dalam sistem"
+        action={
+          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+            {['Semua', 'Info', 'Success', 'Warning', 'Error'].map(t => (
+              <button
+                key={t}
+                onClick={() => setFilter(t)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
+                  filter === t ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
       <div className="bg-white rounded-[16px] border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (
@@ -84,7 +82,7 @@ export default function ActivityLog() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-slate-900 font-medium">
-                      <span className="font-bold">{log.users?.email || 'Sistem'}</span> {log.action} <span className="font-bold">{log.target}</span>
+                      <span className="font-bold">{log.user_email || 'Sistem'}</span> {log.action} <span className="font-bold">{log.target}</span>
                     </p>
                     {log.details && (
                       <p className="text-xs text-slate-500 mt-1">{log.details}</p>

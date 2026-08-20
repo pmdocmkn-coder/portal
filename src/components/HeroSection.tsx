@@ -63,7 +63,10 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
   return (
     <a
       href={portal.url}
-      className="group w-full max-w-[280px] flex flex-row items-center justify-start gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none"
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
+      className="group w-full max-w-[280px] flex flex-row items-center justify-start gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none"
     >
       <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
          {portal.customIcon ? (
@@ -150,7 +153,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
 
     fetchSettings();
 
-    // Setup live refresh subscriptions
     const portalsSubscription = supabase
       .channel('public:portal_items')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'portal_items' }, () => {
@@ -316,7 +318,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari aplikasi atau layanan..."
-                  className="w-full bg-white/10 backdrop-blur-md border border-white/30 rounded-full py-4 pl-16 pr-6 text-white placeholder-white/70 focus:outline-none focus:bg-white/20 focus:border-white/60 focus:ring-4 focus:ring-white/10 transition-all shadow-lg text-base font-medium"
+                  className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-4 pl-16 pr-6 text-white placeholder-white/70 focus:outline-none focus:bg-white/20 focus:border-white/40 focus:ring-4 focus:ring-white/10 transition-all shadow-lg text-base font-medium"
                 />
               </div>
             </FadeIn>
@@ -350,7 +352,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
           <FadeIn y={20} delay={0.5} duration={1}>
             <button 
               onClick={onExpandPortals}
-              className="mt-8 px-8 py-3.5 rounded-full border border-white/30 bg-white/20 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-md"
+              className="mt-8 px-8 py-3.5 rounded-full border border-white/20 bg-white/10 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-md"
             >
               Lihat Semua Portal 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1 stroke-[3]" />

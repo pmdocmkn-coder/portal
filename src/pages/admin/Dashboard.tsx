@@ -8,6 +8,7 @@ import {
   Circle
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -18,13 +19,20 @@ export default function Dashboard() {
   const [activities, setActivities] = useState<any[]>([]);
   const [popularPortals, setPopularPortals] = useState<any[]>([]);
 
+  const [chartPath, setChartPath] = useState('');
+  const [chartLabels, setChartLabels] = useState<string[]>([]);
+
   useEffect(() => {
     const fetchStats = async () => {
-      const [portalsRes, settingsRes, activitiesRes, clicksRes] = await Promise.all([
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const [portalsRes, settingsRes, activitiesRes, clicksRes, visitorsRes] = await Promise.all([
         supabase.from('portal_items').select('*'),
-        supabase.from('brand_settings').select('stats_visitors').single(),
-        supabase.from('activity_logs').select('*, users:user_id(email)').order('created_at', { ascending: false }).limit(5),
-        supabase.from('portal_clicks').select('portal_id, clicks, portal_items(title, category)')
+        supabase.from('site_settings').select('stats_visitors').single(),
+        supabase.from('activity_logs_with_users').select('*').order('created_at', { ascending: false }).limit(5),
+        supabase.from('portal_clicks').select('portal_id, clicks, portal_items(title, category)'),
+        supabase.from('daily_visitors').select('date, count').gte('date', thirtyDaysAgo.toISOString().split('T')[0]).order('date', { ascending: true })
       ]);
 
       let categoriesCount = 0;
@@ -63,6 +71,51 @@ export default function Dashboard() {
           ...p,
           pct: totalClicks > 0 ? Math.round((p.clicks / totalClicks) * 100) : 0
         }));
+
+      // Generate Chart Path
+      const visitors = visitorsRes.data || [];
+      
+      // If we don't have enough data, generate some zeroes or use a fallback line
+      if (visitors.length < 2) {
+        setChartPath('M0,200 L1000,200');
+        setChartLabels(['30 Hari Lalu', 'Hari Ini']);
+      } else {
+        const maxCount = Math.max(...visitors.map(v => v.count), 10);
+        const width = 1000;
+        const height = 140; // max height from top (Y from 60 to 200)
+        
+        const pathData = visitors.reduce((acc, v, i, arr) => {
+          const x = (i / (arr.length - 1)) * width;
+          const y = 200 - (v.count / maxCount) * height;
+          
+          if (i === 0) return `M${x},${y}`;
+          
+          const prevX = ((i - 1) / (arr.length - 1)) * width;
+          const prevY = 200 - (arr[i - 1].count / maxCount) * height;
+          
+          // Simple cubic bezier curve for smoothing
+          const cpX1 = prevX + (x - prevX) * 0.5;
+          const cpY1 = prevY;
+          const cpX2 = prevX + (x - prevX) * 0.5;
+          const cpY2 = y;
+          
+          return `${acc} C${cpX1},${cpY1} ${cpX2},${cpY2} ${x},${y}`;
+        }, '');
+
+        setChartPath(pathData);
+        
+        // Labels
+        const formatDate = (dateStr: string) => {
+          const d = new Date(dateStr);
+          return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+        };
+        
+        setChartLabels([
+          formatDate(visitors[0].date),
+          formatDate(visitors[Math.floor(visitors.length / 2)].date),
+          formatDate(visitors[visitors.length - 1].date)
+        ]);
+      }
 
       setPopularPortals(popular);
       setActivities(activitiesRes.data || []);
@@ -138,11 +191,11 @@ export default function Dashboard() {
 
       {/* Chart Section */}
       <div className="bg-white rounded-[16px] border border-slate-200/80 shadow-sm p-6 relative overflow-hidden">
-        <div className="flex items-center justify-between mb-8 relative z-10">
+        <div className="flex items-center justify-between mb-8">
           <h2 className="text-lg font-bold text-slate-900">Kunjungan 30 Hari Terakhir</h2>
-          <button className="flex items-center gap-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
+          <Link to="/admin/analytics" className="flex items-center gap-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
             Laporan Lengkap <ArrowRight className="w-4 h-4" weight="bold" />
-          </button>
+          </Link>
         </div>
         
         {/* Mock Chart SVG */}
@@ -156,12 +209,12 @@ export default function Dashboard() {
             </defs>
             {/* The fill area */}
             <path 
-              d="M0,150 C100,150 150,170 250,170 C350,170 380,120 450,120 C520,120 560,180 620,180 C700,180 720,80 800,80 C880,80 920,110 950,110 C980,110 1000,80 1000,80 L1000,220 L0,220 Z" 
+              d={`${chartPath} L1000,220 L0,220 Z`} 
               fill="url(#chartGradient)" 
             />
             {/* The stroke line */}
             <path 
-              d="M0,150 C100,150 150,170 250,170 C350,170 380,120 450,120 C520,120 560,180 620,180 C700,180 720,80 800,80 C880,80 920,110 950,110 C980,110 1000,80 1000,80" 
+              d={chartPath} 
               fill="none" 
               stroke="#0f172a" 
               strokeWidth="4" 
@@ -173,9 +226,9 @@ export default function Dashboard() {
 
         {/* X-axis labels */}
         <div className="flex justify-between items-center text-xs font-bold text-slate-400 mt-4 px-2">
-          <span>1 Agu</span>
-          <span>10 Agu</span>
-          <span>19 Agu</span>
+          {chartLabels.map((lbl, idx) => (
+            <span key={idx}>{lbl}</span>
+          ))}
         </div>
       </div>
 
@@ -234,7 +287,7 @@ export default function Dashboard() {
                   <div key={act.id} className="relative pl-6">
                     <div className={`absolute -left-[5px] top-1.5 w-2 h-2 rounded-full ${getDotColor(act.type)} ring-4 ring-white`} />
                     <p className="text-sm text-slate-600 leading-relaxed">
-                      {act.users?.email ? <span className="font-bold text-slate-900">{act.users.email}</span> : ''} {act.action} <span className="font-bold text-slate-900">{act.target}</span>
+                      {act.user_email ? <span className="font-bold text-slate-900">{act.user_email}</span> : ''} {act.action} <span className="font-bold text-slate-900">{act.target}</span>
                     </p>
                     <p className="text-xs font-bold text-slate-400 mt-1">
                       {new Date(act.created_at).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })}

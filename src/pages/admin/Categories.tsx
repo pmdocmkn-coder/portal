@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { AdminHeader } from '../../components/ui/AdminHeader';
 import { 
   Plus, 
   Info,
@@ -190,18 +191,18 @@ export default function Categories() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[32px] font-bold text-slate-900 tracking-tight mb-1">Kategori Layanan</h1>
-          <p className="text-slate-500 font-medium text-sm">Kategori digunakan untuk memfilter portal di halaman eksplorasi publik</p>
-        </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" weight="bold" /> Tambah Kategori
-        </button>
-      </div>
+      <AdminHeader 
+        title="Kategori Layanan" 
+        subtitle="Kategori digunakan untuk memfilter portal di halaman eksplorasi publik"
+        action={
+          <button 
+            onClick={() => handleOpenModal()}
+            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" weight="bold" /> Tambah Kategori
+          </button>
+        }
+      />
 
       {/* Info Alert */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-3 shadow-sm">

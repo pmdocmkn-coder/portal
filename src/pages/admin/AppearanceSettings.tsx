@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { AdminHeader } from '../../components/ui/AdminHeader';
 import { 
   Buildings, 
   ShareNetwork, 
@@ -82,11 +84,23 @@ export default function AppearanceSettings() {
       }
 
       if (error) throw error;
-      toast.success('Pengaturan berhasil disimpan');
+
+      // Log activity
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        await supabase.from('activity_logs').insert({
+          user_id: userData.user.id,
+          action: 'memperbarui',
+          target: 'Pengaturan Identitas Website',
+          type: 'success'
+        });
+      }
+
+      toast.success('Pengaturan berhasil disimpan!', { id: toastId });
       setInitialSettings(settings);
       setIsDirty(false);
     } catch (err: any) {
-      toast.error('Gagal menyimpan pengaturan');
+      toast.error('Gagal menyimpan pengaturan', { id: toastId });
     } finally {
       setSaving(false);
     }
@@ -174,48 +188,58 @@ export default function AppearanceSettings() {
       </div>
     );
   };
-
   if (loading) return <div className="p-8 text-slate-500">Memuat...</div>;
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8 pb-12">
       
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-            <span>Pengaturan</span>
-            <span>&rsaquo;</span>
-            <span className="text-slate-600">Identitas Website</span>
-          </div>
-          <h1 className="text-[32px] font-bold text-slate-900 tracking-tight mb-1">Identitas Website</h1>
-          <p className="text-slate-500 font-medium text-sm">Kelola informasi dasar dan identitas visual portal Anda</p>
-        </div>
-        
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          {isDirty && (
-            <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-2 rounded-lg text-xs font-bold border border-amber-200 mr-2">
-              <WarningCircle className="w-4 h-4" weight="fill" />
-              Perubahan belum disimpan
-            </div>
-          )}
-          <button 
-            onClick={handleCancel}
-            disabled={!isDirty || saving}
-            className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-colors shadow-sm"
-          >
-            Batalkan
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={!isDirty || saving}
-            className="px-5 py-2.5 bg-[#0f172a] text-white font-semibold text-sm rounded-xl hover:bg-[#1e293b] disabled:opacity-50 transition-colors shadow-sm"
-          >
-            {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
-          </button>
-        </div>
-      </div>
+      {/* Header */}
+      <AdminHeader 
+        title="Identitas Website" 
+        subtitle="Kelola informasi dasar dan identitas visual portal Anda"
+        action={
+          <>
+            {isDirty && (
+              <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-2 rounded-lg text-xs font-bold border border-amber-200 mr-2">
+                <WarningCircle className="w-4 h-4" weight="fill" />
+                Perubahan belum disimpan
+              </div>
+            )}
+            <button 
+              onClick={() => {
+                setSettings(initialSettings);
+                setIsDirty(false);
+              }}
+              disabled={!isDirty || saving}
+              className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                isDirty && !saving
+                  ? 'text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-sm'
+                  : 'text-slate-400 bg-transparent border border-transparent'
+              }`}
+            >
+              Batalkan
+            </button>
+            <button 
+              onClick={handleSave}
+              disabled={!isDirty || saving}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm ${
+                isDirty && !saving
+                  ? 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-md hover:-translate-y-0.5' 
+                  : 'bg-slate-400 text-white/90 cursor-not-allowed'
+              }`}
+            >
+              {saving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan Perubahan'
+              )}
+            </button>
+          </>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
@@ -249,7 +273,151 @@ export default function AppearanceSettings() {
                   className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors resize-y"
                 />
               </div>
+            </div>
+          </div>
 
+          {/* Teks Eksplorasi Portal */}
+          <div className="bg-white rounded-[16px] border border-slate-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <TextAa className="w-6 h-6 text-slate-700" weight="duotone" />
+              <h2 className="text-lg font-bold text-slate-900">Pengaturan Menu Eksplorasi</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-bold text-slate-700">Teks Judul Utama (Eksplorasi Title)</label>
+                <textarea 
+                  rows={2}
+                  value={settings.explore_title || ''} 
+                  onChange={(e) => handleChange('explore_title', e.target.value)}
+                  placeholder="Makin produktif dengan berbagai *aplikasi digital*"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors resize-y"
+                />
+                <p className="text-[11px] font-medium text-slate-400">Gunakan tanda bintang untuk memberi warna oranye-merah. Contoh: Pusat Layanan *Terintegrasi*</p>
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-bold text-slate-700">Teks Sub-Judul (Eksplorasi Subtitle)</label>
+                <textarea 
+                  rows={2}
+                  value={settings.explore_subtitle || ''} 
+                  onChange={(e) => handleChange('explore_subtitle', e.target.value)}
+                  placeholder="Lengkapi dan lindungi semua aktivitas digital dengan layanan tambahan terbaik."
+                  className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors resize-y"
+                />
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-bold text-slate-700">Gambar Karakter (Kiri)</label>
+                <div 
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e: any) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        const loadingToast = toast.loading('Mengunggah gambar eksplorasi...');
+                        const file = e.target.files[0];
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `explore_${Math.random()}.${fileExt}`;
+                        supabase.storage
+                          .from('portal_assets')
+                          .upload(`hero/${fileName}`, file, { upsert: true })
+                          .then(({ error }) => {
+                            if (error) {
+                              toast.error('Gagal mengunggah: ' + error.message, { id: loadingToast });
+                            } else {
+                              const { data } = supabase.storage.from('portal_assets').getPublicUrl(`hero/${fileName}`);
+                              handleChange('explore_image_url', data.publicUrl);
+                              toast.success('Gambar berhasil diunggah', { id: loadingToast });
+                            }
+                          });
+                      }
+                    };
+                    input.click();
+                  }}
+                  className="relative w-full h-48 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all group overflow-hidden border-slate-300 bg-slate-50 hover:bg-slate-100"
+                >
+                  {settings.explore_image_url ? (
+                    <div className="w-full h-full p-4 flex items-center justify-center relative">
+                      <img src={settings.explore_image_url} alt="Explore Image" className="max-w-full max-h-full object-contain drop-shadow-sm" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                        <span className="text-white text-xs font-bold px-3 py-1.5 bg-white/20 rounded-lg backdrop-blur-md">Ubah Gambar</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center text-slate-500 gap-2">
+                      <UploadSimple size={28} className="text-slate-400 group-hover:text-blue-500 transition-colors" weight="duotone" />
+                      <span className="text-[11px] font-medium px-4 text-center">Klik untuk mengunggah gambar karakter PNG/WebP</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Banner Statistik */}
+          <div className="bg-white rounded-[16px] border border-slate-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <ImageIcon className="w-6 h-6 text-slate-700" weight="duotone" />
+              <h2 className="text-lg font-bold text-slate-900">Pengaturan Banner Statistik</h2>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700">Gambar Latar Belakang (Background)</label>
+              <div 
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = (e: any) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      const loadingToast = toast.loading('Mengunggah gambar latar...');
+                      const file = e.target.files[0];
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `stats_bg_${Math.random()}.${fileExt}`;
+                      supabase.storage
+                        .from('portal_assets')
+                        .upload(`hero/${fileName}`, file, { upsert: true })
+                        .then(({ error }) => {
+                          if (error) {
+                            toast.error('Gagal mengunggah: ' + error.message, { id: loadingToast });
+                          } else {
+                            const { data } = supabase.storage.from('portal_assets').getPublicUrl(`hero/${fileName}`);
+                            handleChange('stats_bg_image', data.publicUrl);
+                            toast.success('Gambar latar berhasil diunggah', { id: loadingToast });
+                          }
+                        });
+                    }
+                  };
+                  input.click();
+                }}
+                className="relative w-full h-48 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all group overflow-hidden border-slate-300 bg-slate-50 hover:bg-slate-100"
+              >
+                {settings.stats_bg_image ? (
+                  <div className="w-full h-full p-0 flex items-center justify-center relative">
+                    <img src={settings.stats_bg_image} alt="Stats Background" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                      <span className="text-white text-xs font-bold px-3 py-1.5 bg-white/20 rounded-lg backdrop-blur-md">Ubah Gambar</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center text-slate-500 gap-2">
+                    <UploadSimple size={28} className="text-slate-400 group-hover:text-blue-500 transition-colors" weight="duotone" />
+                    <span className="text-[11px] font-medium px-4 text-center">Klik untuk mengunggah gambar latar (JPG/PNG) disarankan ukuran lebar</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[16px] border border-slate-200 p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+              <Buildings className="w-6 h-6 text-slate-700" weight="duotone" />
+              <h2 className="text-lg font-bold text-slate-900">Informasi Perusahaan</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700">Nama Perusahaan <span className="text-red-500">*</span></label>
                 <input 

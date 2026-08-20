@@ -14,6 +14,7 @@ import AppearanceSettings from './pages/admin/AppearanceSettings';
 import HeroSliders from './pages/admin/HeroSliders';
 import Users from './pages/admin/Users';
 import ActivityLog from './pages/admin/ActivityLog';
+import AnalyticsReport from './pages/admin/AnalyticsReport';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="sliders" element={<HeroSliders />} />
             <Route path="users" element={<Users />} />
             <Route path="activity" element={<ActivityLog />} />
+            <Route path="analytics" element={<AnalyticsReport />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

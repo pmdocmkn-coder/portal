@@ -5,6 +5,7 @@ import { PencilSimple, Trash, Plus, ArrowUpRight, X, UploadSimple, Plugs, Info }
 import toast from 'react-hot-toast';
 import { Select } from '../../components/ui/Select';
 import { useAuth } from '../../contexts/AuthContext';
+import { AdminHeader } from '../../components/ui/AdminHeader';
 
 interface PortalFormData {
   id?: string;
@@ -83,12 +84,23 @@ export default function PortalsManager() {
   const handleDelete = async (id: string) => {
     if (!confirm('Yakin ingin menghapus portal ini?')) return;
     
+    const portalToDel = portals.find(p => p.id === id);
     const { error } = await supabase.from('portal_items').delete().eq('id', id);
     if (error) {
       toast.error('Gagal menghapus: ' + error.message);
     } else {
       toast.success('Portal berhasil dihapus');
       setPortals(portals.filter(p => p.id !== id));
+      
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user && portalToDel) {
+        await supabase.from('activity_logs').insert({
+          user_id: userData.user.id,
+          action: 'menghapus',
+          target: `Portal ${portalToDel.title}`,
+          type: 'error'
+        });
+      }
     }
   };
 
@@ -164,6 +176,8 @@ export default function PortalsManager() {
       custom_image: formData.customIcon,
       description: formData.description
     };
+    
+    const { data: userData } = await supabase.auth.getUser();
 
     if (isEdit) {
       const { error } = await supabase.from('portal_items').update(payload).eq('id', formData.id);
@@ -171,6 +185,14 @@ export default function PortalsManager() {
         toast.error('Gagal memperbarui: ' + error.message);
       } else {
         toast.success('Portal berhasil diperbarui');
+        if (userData.user) {
+          await supabase.from('activity_logs').insert({
+            user_id: userData.user.id,
+            action: 'memperbarui',
+            target: `Portal ${formData.title}`,
+            type: 'info'
+          });
+        }
         fetchPortals();
         handleCloseModal();
       }
@@ -180,6 +202,14 @@ export default function PortalsManager() {
         toast.error('Gagal menambahkan portal: ' + error.message);
       } else {
         toast.success('Portal berhasil ditambahkan');
+        if (userData.user) {
+          await supabase.from('activity_logs').insert({
+            user_id: userData.user.id,
+            action: 'membuat',
+            target: `Portal ${formData.title}`,
+            type: 'success'
+          });
+        }
         fetchPortals();
         handleCloseModal();
       }
@@ -196,19 +226,19 @@ export default function PortalsManager() {
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="flex flex-col gap-6 mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold text-slate-900 tracking-tight">Kelola Portal</h1>
-            <p className="text-slate-500 mt-1">Kelola tautan portal dan integrasi layanan</p>
-          </div>
-          <button 
-            onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 bg-[#1B3A6B] text-white px-5 py-2.5 rounded-lg font-medium tracking-wide shadow-[0_4px_14px_0_rgba(27,58,107,0.39)] hover:shadow-[0_6px_20px_rgba(27,58,107,0.23)] hover:-translate-y-[1px] active:scale-[0.98] transition-all duration-300"
-          >
-            <Plus weight="bold" />
-            Tambah Portal
-          </button>
-        </div>
+        <AdminHeader 
+          title="Kelola Portal" 
+          subtitle="Kelola tautan portal dan integrasi layanan"
+          action={
+            <button 
+              onClick={() => handleOpenModal()}
+              className="flex items-center gap-2 bg-[#1B3A6B] text-white px-5 py-2.5 rounded-lg font-medium tracking-wide shadow-[0_4px_14px_0_rgba(27,58,107,0.39)] hover:shadow-[0_6px_20px_rgba(27,58,107,0.23)] hover:-translate-y-[1px] active:scale-[0.98] transition-all duration-300"
+            >
+              <Plus weight="bold" />
+              Tambah Portal
+            </button>
+          }
+        />
 
         {/* Search and Filter */}
         <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white p-4 rounded-[20px] shadow-sm border border-slate-100">

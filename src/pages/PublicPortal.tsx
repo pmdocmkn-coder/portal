@@ -15,10 +15,13 @@ export default function PublicPortal() {
   const [isPortalsClosing, setIsPortalsClosing] = useState(false);
 
   React.useEffect(() => {
-    // Increment visitor count when public portal mounts
+    // Increment visitor count when public portal mounts (once per session)
     const incrementVisitor = async () => {
       try {
-        await supabase.rpc('increment_visitor_count');
+        if (!sessionStorage.getItem('has_visited_portal')) {
+          await supabase.rpc('increment_visitor_count');
+          sessionStorage.setItem('has_visited_portal', 'true');
+        }
       } catch (e) {
         console.error('Failed to increment visitor count:', e);
       }

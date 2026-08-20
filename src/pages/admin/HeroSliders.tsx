@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { AdminHeader } from '../../components/ui/AdminHeader';
 import { Image as ImageIcon, UploadSimple, Trash, ArrowUp, ArrowDown, WarningCircle } from '@phosphor-icons/react';
 
 interface SliderItem {
@@ -152,41 +154,53 @@ export default function HeroSliders() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out space-y-8 pb-12">
       
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-            <span>Pengaturan</span>
-            <span>&rsaquo;</span>
-            <span className="text-slate-600">Slider Beranda</span>
-          </div>
-          <h1 className="text-[32px] font-bold text-slate-900 tracking-tight mb-1">Slider Beranda</h1>
-          <p className="text-slate-500 font-medium text-sm">Kelola gambar latar belakang slider di Halaman Utama</p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {isDirty && (
-            <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-2 rounded-lg text-xs font-bold border border-amber-200 mr-2">
-              <WarningCircle className="w-4 h-4" weight="fill" />
-              Perubahan belum disimpan
-            </div>
-          )}
-          <button 
-            onClick={() => fetchSliders()}
-            disabled={!isDirty || saving}
-            className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-colors shadow-sm"
-          >
-            Batalkan
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={!isDirty || saving}
-            className="px-5 py-2.5 bg-[#0f172a] text-white font-semibold text-sm rounded-xl hover:bg-[#1e293b] disabled:opacity-50 transition-colors shadow-sm"
-          >
-            {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
-          </button>
-        </div>
-      </div>
+      {/* Header */}
+      <AdminHeader 
+        title="Slider Beranda" 
+        subtitle="Kelola gambar latar belakang slider di Halaman Utama"
+        action={
+          <>
+            {isDirty && (
+              <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-2 rounded-lg text-xs font-bold border border-amber-200 mr-2">
+                <WarningCircle className="w-4 h-4" weight="fill" />
+                Perubahan belum disimpan
+              </div>
+            )}
+            <button 
+              onClick={() => {
+                setSliders(initialSliders);
+                setIsDirty(false);
+              }}
+              disabled={!isDirty || saving}
+              className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                isDirty && !saving
+                  ? 'text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-sm'
+                  : 'text-slate-400 bg-transparent border border-transparent'
+              }`}
+            >
+              Batalkan
+            </button>
+            <button 
+              onClick={handleSave}
+              disabled={!isDirty || saving}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm ${
+                isDirty && !saving
+                  ? 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-md hover:-translate-y-0.5' 
+                  : 'bg-slate-400 text-white/90 cursor-not-allowed'
+              }`}
+            >
+              {saving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan Perubahan'
+              )}
+            </button>
+          </>
+        }
+      />
 
       <div className="bg-white rounded-[16px] border border-slate-200 p-8 shadow-sm">
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
