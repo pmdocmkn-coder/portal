@@ -19,7 +19,22 @@ export const StatsSection: React.FC = () => {
         bgImage: settingsRes.data?.stats_bg_image || '/hero_tower_bg.jpg'
       });
     };
+
     fetchStats();
+
+    // Realtime: update visitor count live when site_settings changes
+    const channel = supabase
+      .channel('stats-section-live')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_settings', filter: 'id=eq.1' },
+        (payload) => {
+          if (payload.new?.stats_visitors !== undefined) {
+            setStats(prev => ({ ...prev, visitors: payload.new.stats_visitors }));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const formatNumber = (num: number) => {
