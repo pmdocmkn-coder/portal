@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { HeroSection } from '../components/HeroSection';
-import { StatsSection } from '../components/StatsSection';
-import { PortalsShowcaseSection } from '../components/PortalsShowcaseSection';
-import { FooterSection } from '../components/FooterSection';
-import { SitePreviewModal } from '../components/ui/SitePreviewModal';
-import { ContactModal } from '../components/ui/ContactModal';
+import React, { useState, Suspense, lazy } from 'react';
+import { HeroSection } from '../components/HeroSection'; // above fold — eager
 import { PortalSite } from '../types';
 import { supabase } from '../lib/supabase';
+
+// Below-fold components — lazy loaded to reduce initial bundle
+const StatsSection = lazy(() => import('../components/StatsSection').then(m => ({ default: m.StatsSection })));
+const PortalsShowcaseSection = lazy(() => import('../components/PortalsShowcaseSection').then(m => ({ default: m.PortalsShowcaseSection })));
+const FooterSection = lazy(() => import('../components/FooterSection').then(m => ({ default: m.FooterSection })));
+const SitePreviewModal = lazy(() => import('../components/ui/SitePreviewModal').then(m => ({ default: m.SitePreviewModal })));
+const ContactModal = lazy(() => import('../components/ui/ContactModal').then(m => ({ default: m.ContactModal })));
 
 export default function PublicPortal() {
   const [selectedSite, setSelectedSite] = useState<PortalSite | null>(null);
@@ -59,34 +61,42 @@ export default function PublicPortal() {
 
   return (
     <div className="bg-[#F7F8FA] min-h-screen text-[#1A202C] font-sans overflow-x-clip selection:bg-[#1B3A6B] selection:text-white">
-      {/* 1. Hero Section with Sticky Header */}
+      {/* 1. Hero Section with Sticky Header — eagerly loaded (above fold) */}
       <HeroSection
         onOpenContact={() => setIsContactOpen(true)}
         onNavigate={handleNavigate}
         onExpandPortals={handleExpandPortals}
       />
 
-      {/* Portals Showcase (Expandable) */}
-      {isPortalsExpanded && <PortalsShowcaseSection onClose={handleClosePortals} isClosing={isPortalsClosing} />}
+      {/* Portals Showcase (Expandable) — lazy */}
+      <Suspense fallback={null}>
+        {isPortalsExpanded && <PortalsShowcaseSection onClose={handleClosePortals} isClosing={isPortalsClosing} />}
+      </Suspense>
 
-      {/* 2. Stats Section */}
-      <StatsSection />
-      {/* Footer */}
-      <FooterSection
-        onOpenContact={() => setIsContactOpen(true)}
-        onNavigate={handleNavigate}
-      />
+      {/* 2. Stats Section — lazy */}
+      <Suspense fallback={<div className="h-32 bg-[#2B3F56]" />}>
+        <StatsSection />
+      </Suspense>
 
-      {/* Modals */}
-      <SitePreviewModal
-        site={selectedSite}
-        onClose={() => setSelectedSite(null)}
-      />
+      {/* Footer — lazy */}
+      <Suspense fallback={null}>
+        <FooterSection
+          onOpenContact={() => setIsContactOpen(true)}
+          onNavigate={handleNavigate}
+        />
+      </Suspense>
 
-      <ContactModal
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
-      />
+      {/* Modals — lazy */}
+      <Suspense fallback={null}>
+        <SitePreviewModal
+          site={selectedSite}
+          onClose={() => setSelectedSite(null)}
+        />
+        <ContactModal
+          isOpen={isContactOpen}
+          onClose={() => setIsContactOpen(false)}
+        />
+      </Suspense>
     </div>
   );
 }

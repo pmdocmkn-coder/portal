@@ -72,11 +72,11 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
       rel="noopener noreferrer"
       onClick={handleClick}
       title={displayTitle}
-      className="group/card relative flex flex-col items-center text-center gap-1.5 p-2.5 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/10 hover:border-white/20 hover:-translate-y-1 transition-all duration-300 outline-none w-full h-full"
+      className="group/card relative flex flex-col items-center text-center gap-1.5 p-2.5 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/15 sm:bg-white/10 sm:backdrop-blur-md border border-white/10 hover:bg-white/20 hover:border-white/20 hover:-translate-y-1 transition-all duration-300 outline-none w-full h-full"
     >
       <div className={`w-12 h-12 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover/card:scale-105 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
          {portal.customIcon ? (
-           <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-xl" />
+           <img src={portal.customIcon} alt={displayTitle} loading="lazy" className="w-full h-full object-contain rounded-xl" />
          ) : (
            <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full text-[10px] sm:text-xs font-black`}>
              {getIconForPortal(themeIdx, `w-5 h-5 md:w-6 md:h-6`)}
@@ -191,11 +191,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
     if (heroImages.length === 0) return;
     const timer = setInterval(() => {
       setBgImageIdx((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
+    }, 7000);
     return () => clearInterval(timer);
   }, [heroImages]);
 
-
+  // Preload all hero background images so transitions are instant (no blank flash)
+  useEffect(() => {
+    if (heroImages.length === 0) return;
+    heroImages.forEach((url) => {
+      const img = new Image();
+      img.src = url;
+    });
+  }, [heroImages]);
 
   const filteredPortals = useMemo(() => {
     if (!searchQuery) return portals;
@@ -262,7 +269,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
       {heroImages.map((img, idx) => (
         <div 
           key={img + idx}
-          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${idx === bgImageIdx ? 'opacity-100' : 'opacity-0'} pointer-events-none`}
+          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-[1500ms] ease-in-out ${idx === bgImageIdx ? 'opacity-100' : 'opacity-0'} pointer-events-none`}
           style={{ backgroundImage: `url(${img})` }}
         />
       ))}
@@ -432,7 +439,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
           <FadeIn y={20} delay={0.5} duration={1}>
             <button 
               onClick={onExpandPortals}
-              className="mt-2 px-8 py-3.5 rounded-full border border-white/20 bg-white/10 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-md"
+              className="mt-2 px-8 py-3.5 rounded-full border border-white/20 bg-white/10 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer sm:backdrop-blur-md"
             >
               Lihat Semua Portal 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1 stroke-[3]" />
