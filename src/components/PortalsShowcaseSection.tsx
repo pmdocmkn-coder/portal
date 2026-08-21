@@ -262,7 +262,7 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                                     href={portal.url} 
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
+                                    onClick={() => { supabase.rpc('increment_portal_click', { p_portal_id: portal.id }).then(() => {}).catch(() => {}); }}
                                     className="group relative flex 
                                       flex-col items-center text-center gap-2 p-3 rounded-2xl 
                                       sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl 

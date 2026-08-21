@@ -60,12 +60,17 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
   const isCircle = true; // Always use circle to match reference nicely, or keep the alternating logic. Let's make it always circle.
   let displayTitle = portal.title.replace(' Portal', '');
   
+  const handleClick = (e: React.MouseEvent) => {
+    // Fire click tracking without blocking navigation
+    supabase.rpc('increment_portal_click', { p_portal_id: portal.id }).then(() => {}).catch(() => {});
+  };
+
   return (
     <a
       href={portal.url}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
+      onClick={handleClick}
       title={displayTitle}
       className="group/card relative flex flex-col items-center text-center gap-1.5 p-2.5 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/10 hover:border-white/20 hover:-translate-y-1 transition-all duration-300 outline-none w-full h-full"
     >
