@@ -66,19 +66,20 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
-      className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 outline-none w-full max-w-[280px]"
+      title={displayTitle}
+      className="group/card relative flex flex-col items-center text-center gap-1.5 p-2.5 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/10 hover:border-white/20 hover:-translate-y-1 transition-all duration-300 outline-none w-full h-full"
     >
-      <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
+      <div className={`w-12 h-12 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover/card:scale-105 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
          {portal.customIcon ? (
-           <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
+           <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-xl" />
          ) : (
            <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full text-[10px] sm:text-xs font-black`}>
              {getIconForPortal(themeIdx, `w-5 h-5 md:w-6 md:h-6`)}
            </div>
          )}
       </div>
-      <div className="flex flex-col relative z-10 sm:flex-grow sm:pr-4 w-full justify-center">
-         <h3 className="text-[11px] leading-tight sm:text-[13px] md:text-[15px] font-bold text-white sm:leading-snug line-clamp-2 drop-shadow-sm">{displayTitle}</h3>
+      <div className="flex flex-col relative z-10 sm:flex-grow sm:pr-4 w-full justify-center min-w-0">
+         <h3 className="text-[10px] leading-tight min-h-[2.4em] sm:min-h-0 sm:text-[13px] md:text-[15px] font-bold text-white sm:leading-snug drop-shadow-sm line-clamp-2">{displayTitle}</h3>
       </div>
     </a>
   );
@@ -200,15 +201,41 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
     );
   }, [searchQuery, portals]);
 
+  // Calculate column width dynamically based on container
+  const [colWidth, setColWidth] = useState(0);
+  const [visibleCols, setVisibleCols] = useState(4);
+  const [gapSize, setGapSize] = useState(20);
+
+  useEffect(() => {
+    const measure = () => {
+      if (scrollContainerRef.current) {
+        const containerWidth = scrollContainerRef.current.clientWidth;
+        // Responsive columns: 4 on all sizes, but gap changes
+        const isMobile = window.innerWidth < 640;
+        const gap = isMobile ? 8 : 20; // gap-2 on mobile, gap-5 on desktop
+        const cols = isMobile ? 4 : 4;
+        setGapSize(gap);
+        setVisibleCols(cols);
+        const w = (containerWidth - (cols - 1) * gap) / cols;
+        setColWidth(w);
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [filteredPortals.length]);
+
   const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -340, behavior: 'smooth' });
+    if (scrollContainerRef.current && colWidth > 0) {
+      const scrollAmount = visibleCols * colWidth + (visibleCols - 1) * gapSize;
+      scrollContainerRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     }
   };
 
   const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 340, behavior: 'smooth' });
+    if (scrollContainerRef.current && colWidth > 0) {
+      const scrollAmount = visibleCols * colWidth + (visibleCols - 1) * gapSize;
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
@@ -320,7 +347,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
             </FadeIn>
 
             {/* Search Bar */}
-            <FadeIn y={30} delay={0.2} duration={0.8} className="w-full max-w-2xl mx-auto px-4 mt-2 mb-12">
+            <FadeIn y={30} delay={0.2} duration={0.8} className="w-full max-w-2xl mx-auto px-4 mt-2 mb-2">
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none z-10">
                   <MagnifyingGlass weight="bold" className="h-5 w-5 text-white/60 group-focus-within:text-white transition-colors" />
@@ -342,27 +369,39 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
               <div className="h-[200px] w-full max-w-6xl mx-auto" />
             ) : filteredPortals.length > 0 ? (
               <div className="w-full relative flex justify-center px-4">
-                <div className="w-full max-w-6xl mx-auto relative group">
+                <div className="w-full max-w-[1350px] mx-auto flex items-center gap-4 md:gap-6 px-4 group">
                   {/* Panah Kiri */}
                   <button 
                     onClick={scrollLeft} 
-                    className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/30 backdrop-blur-md p-3 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:block"
+                    className="shrink-0 z-20 bg-black/20 hover:bg-black/40 backdrop-blur-md p-3 md:p-4 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex"
                   >
-                    <ChevronLeft className="w-6 h-6" />
+                    <ChevronLeft className="w-6 h-6 stroke-[3]" />
                   </button>
 
                   {/* Slider Container */}
                   <div 
                     ref={scrollContainerRef} 
-                    className="grid grid-rows-2 grid-flow-col auto-cols-[260px] md:auto-cols-[280px] gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-6 px-4 md:px-0"
+                    className="flex-1 flex gap-2 sm:gap-5 overflow-x-auto snap-x snap-mandatory hide-scrollbar py-4 sm:py-6"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
-                    {filteredPortals.map((portal, idx) => {
-                      const themeIdx = portals.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
-                      const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
+                    {Array.from({ length: Math.ceil(filteredPortals.length / 2) }).map((_, colIdx) => {
+                      const colItems = filteredPortals.slice(colIdx * 2, colIdx * 2 + 2);
                       return (
-                        <div key={`${portal.id}-${idx}`} className="snap-start h-full w-full flex items-center justify-center">
-                          <PortalAppItem portal={portal} theme={theme} themeIdx={themeIdx} idx={idx} />
+                        <div 
+                          key={colIdx} 
+                          className="shrink-0 snap-start flex flex-col gap-2 sm:gap-5"
+                          style={colWidth > 0 ? { width: `${colWidth}px` } : { width: '85%' }}
+                        >
+                          {colItems.map((portal, idx) => {
+                            const globalIdx = colIdx * 2 + idx;
+                            const themeIdx = portals.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
+                            const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
+                            return (
+                              <div key={`${portal.id}-${globalIdx}`} className="w-full">
+                                <PortalAppItem portal={portal} theme={theme} themeIdx={themeIdx} idx={globalIdx} />
+                              </div>
+                            );
+                          })}
                         </div>
                       );
                     })}
@@ -371,9 +410,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
                   {/* Panah Kanan */}
                   <button 
                     onClick={scrollRight} 
-                    className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/30 backdrop-blur-md p-3 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:block"
+                    className="shrink-0 z-20 bg-black/20 hover:bg-black/40 backdrop-blur-md p-3 md:p-4 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex"
                   >
-                    <ChevronRight className="w-6 h-6" />
+                    <ChevronRight className="w-6 h-6 stroke-[3]" />
                   </button>
                 </div>
               </div>
@@ -388,7 +427,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
           <FadeIn y={20} delay={0.5} duration={1}>
             <button 
               onClick={onExpandPortals}
-              className="mt-8 px-8 py-3.5 rounded-full border border-white/20 bg-white/10 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-md"
+              className="mt-2 px-8 py-3.5 rounded-full border border-white/20 bg-white/10 hover:bg-[#E05A44] hover:border-[#E05A44] active:bg-[#E85D44] active:scale-95 text-white font-bold text-[14px] tracking-wide shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(224,90,68,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group mx-auto cursor-pointer backdrop-blur-md"
             >
               Lihat Semua Portal 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1 stroke-[3]" />
