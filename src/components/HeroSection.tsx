@@ -4,6 +4,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import { LogoIntroModal } from './ui/LogoIntroModal';
 import { FadeIn } from './ui/FadeIn';
 import { MarqueeItem } from '../data/portalData';
+import { optimizeImage } from '../lib/imageUtils';
 
 const getIconForPortal = (index: number, className: string = "") => {
   const icons = [Settings, Activity, Database, BarChart2, ShieldCheck, Headset, Cctv];
@@ -76,7 +77,7 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
     >
       <div className={`w-12 h-12 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover/card:scale-105 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
          {portal.customIcon ? (
-           <img src={portal.customIcon} alt={displayTitle} loading="lazy" className="w-full h-full object-contain rounded-xl" />
+           <img src={optimizeImage(portal.customIcon, 96)} alt={displayTitle} loading="lazy" className="w-full h-full object-contain rounded-xl" />
          ) : (
            <div className={`w-full h-full ${theme.innerRing} flex items-center justify-center rounded-full text-[10px] sm:text-xs font-black`}>
              {getIconForPortal(themeIdx, `w-5 h-5 md:w-6 md:h-6`)}

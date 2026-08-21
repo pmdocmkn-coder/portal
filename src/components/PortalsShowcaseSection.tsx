@@ -8,7 +8,7 @@ import {
 import { MarqueeItem } from '../data/portalData';
 import workerImage from '../assets/images/real_worker2.png';
 import { supabase } from '../lib/supabase';
-
+import { optimizeImage } from '../lib/imageUtils';
 const getCategoryIcon = (iconName?: string) => {
   const icons: Record<string, any> = {
     Gear, CarProfile, Buildings, ShieldCheck, FileText, BookOpen, 
@@ -271,7 +271,7 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                                     {/* Icon Box */}
                                     <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'rounded-full bg-white p-1 border-2 border-white/90 shadow-sm overflow-hidden' : ''}`}>
                                       {portal.customIcon ? (
-                                        <img src={portal.customIcon} alt={displayTitle} loading="lazy" className="w-full h-full object-contain rounded-[10px]" />
+                                        <img src={optimizeImage(portal.customIcon, 96)} alt={displayTitle} loading="lazy" className="w-full h-full object-contain rounded-[10px]" />
                                       ) : (
                                         <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black text-[#E85D44] bg-[#E85D44]/10">
                                           MKN
