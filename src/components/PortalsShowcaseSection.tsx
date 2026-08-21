@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ArrowUpRight, X } from 'lucide-react';
 import { 
   CaretLeft, CaretRight, SquaresFour, Gear, CarProfile, Buildings, ShieldCheck, 
@@ -24,11 +24,12 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [currentPage, setCurrentPage] = useState(0);
   const [siteSettings, setSiteSettings] = useState<any>({});
+  const showcaseScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const [portalsRes, catsRes, settingsRes] = await Promise.all([
-        supabase.from('portal_items').select('*').order('created_at', { ascending: false }),
+        supabase.from('portal_items').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false }),
         supabase.from('categories').select('name, icon').eq('is_active', true).order('display_order', { ascending: true }),
         supabase.from('site_settings').select('*').eq('id', 1).single()
       ]);
@@ -67,7 +68,7 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
       if (window.innerWidth >= 1280) setItemsPerPage(6); // xl screens: 3 cols x 2 rows
       else if (window.innerWidth >= 1024) setItemsPerPage(4); // lg screens: 2 cols x 2 rows
       else if (window.innerWidth >= 768) setItemsPerPage(4); // md screens: 2 cols x 2 rows
-      else setItemsPerPage(8); // mobile: 4 cols x 2 rows (icon grid)
+      else setItemsPerPage(12); // mobile: 4 cols x 3 rows (icon grid)
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -92,10 +93,26 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
 
   useEffect(() => {
     setCurrentPage(0);
+    // Reset scroll position when category changes
+    if (showcaseScrollRef.current) {
+      showcaseScrollRef.current.scrollTo({ left: 0 });
+    }
   }, [activeCategory, itemsPerPage]);
 
-  const nextPage = () => setCurrentPage(p => Math.min(totalPages - 1, p + 1));
-  const prevPage = () => setCurrentPage(p => Math.max(0, p - 1));
+  const nextPage = () => {
+    const newPage = Math.min(totalPages - 1, currentPage + 1);
+    setCurrentPage(newPage);
+    if (showcaseScrollRef.current) {
+      showcaseScrollRef.current.scrollTo({ left: newPage * showcaseScrollRef.current.clientWidth, behavior: 'smooth' });
+    }
+  };
+  const prevPage = () => {
+    const newPage = Math.max(0, currentPage - 1);
+    setCurrentPage(newPage);
+    if (showcaseScrollRef.current) {
+      showcaseScrollRef.current.scrollTo({ left: newPage * showcaseScrollRef.current.clientWidth, behavior: 'smooth' });
+    }
+  };
 
   return (
     <>
@@ -119,38 +136,38 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
         {/* Background Layer */}
         <div className="absolute inset-0 bg-gradient-to-b from-white via-rose-50 to-[#E85D44] pointer-events-none"></div>
 
-        {/* Scrollable Content Layer */}
+         {/* Scrollable Content Layer */}
         <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
-          <div className="min-h-screen w-full flex flex-col justify-start md:justify-center py-16 md:py-24 px-6 lg:px-12 relative z-10">
+          <div className="min-h-screen w-full flex flex-col justify-start md:justify-center py-8 md:py-24 px-4 sm:px-6 lg:px-12 relative z-10">
       
             {/* Global Close Button */}
             {onClose && (
               <button 
                 onClick={onClose}
-                className="fixed right-6 top-6 md:right-10 md:top-10 p-3 text-slate-400 hover:text-[#0B1B3D] bg-white/50 hover:bg-white rounded-full transition-all z-50 backdrop-blur-md border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md group"
+                className="fixed right-4 top-4 md:right-10 md:top-10 p-2.5 md:p-3 text-slate-400 hover:text-[#0B1B3D] bg-white/50 hover:bg-white rounded-full transition-all z-50 backdrop-blur-md border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md group"
               >
-                <X className="w-6 h-6 md:w-7 md:h-7 group-hover:rotate-90 transition-transform duration-300" />
+                <X className="w-5 h-5 md:w-7 md:h-7 group-hover:rotate-90 transition-transform duration-300" />
               </button>
             )}
 
             {/* MOBILE ONLY: Text Header appears top */}
-            <div className="w-full lg:hidden text-center mb-10 pt-4">
+            <div className="w-full lg:hidden text-center mb-4 pt-2">
               {siteSettings.explore_title && (
-                <h2 className="text-3xl md:text-5xl font-black text-[#0B1B3D] tracking-tight mb-3 leading-[1.15]" dangerouslySetInnerHTML={{ __html: siteSettings.explore_title.replace(/\n/g, '<br/>').replace(/\*(.*?)\*/g, '<span class="text-[#E85D44]">$1</span>') }}>
+                <h2 className="text-2xl md:text-5xl font-black text-[#0B1B3D] tracking-tight mb-2 leading-[1.15]" dangerouslySetInnerHTML={{ __html: siteSettings.explore_title.replace(/\n/g, '<br/>').replace(/\*(.*?)\*/g, '<span class="text-[#E85D44]">$1</span>') }}>
                 </h2>
               )}
               {siteSettings.explore_subtitle && (
-                <p className="text-slate-600 text-sm md:text-base leading-relaxed max-w-lg mx-auto font-medium">
+                <p className="text-slate-600 text-xs md:text-base leading-relaxed max-w-lg mx-auto font-medium">
                   {siteSettings.explore_subtitle}
                 </p>
               )}
             </div>
 
-            <div className="max-w-[1600px] w-full mx-auto flex flex-col lg:flex-row gap-8 lg:gap-12 items-center lg:items-center relative z-10">
+            <div className="max-w-[1600px] w-full mx-auto flex flex-col lg:flex-row gap-4 lg:gap-12 items-center lg:items-center relative z-10">
               
               {/* Left Column: Character Image */}
               <div className="w-full lg:w-2/5 xl:w-[45%] flex justify-center lg:justify-center relative">
-                 <div className="w-full max-w-[340px] md:max-w-[450px] lg:max-w-[550px] xl:max-w-[650px] aspect-square relative group z-10">
+                 <div className="w-full max-w-[280px] sm:max-w-[300px] md:max-w-[450px] lg:max-w-[550px] xl:max-w-[650px] aspect-square relative group z-10">
                    {/* Main Image Container */}
                    <div className="relative w-full h-full flex items-center justify-center drop-shadow-[0_20px_50px_rgba(232,93,68,0.25)] transition-all duration-500">
                      <img src={siteSettings.explore_image_url || workerImage} alt="Karakter Ekosistem MKN" className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.03] group-hover:drop-shadow-[0_20px_40px_rgba(232,93,68,0.4)]" />
@@ -175,8 +192,8 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                  </div>
 
                  {/* Pill Tabs */}
-                 <div className="w-full flex justify-start lg:justify-start mb-6 md:mb-8 px-0 -mx-4 lg:mx-0">
-                   <div className="flex flex-row overflow-x-auto gap-2.5 hide-scrollbar py-1 px-4 lg:px-1 w-full">
+                 <div className="w-full flex justify-start lg:justify-start mb-3 md:mb-8 px-0 -mx-4 lg:mx-0">
+                   <div className="flex flex-row overflow-x-auto gap-2 sm:gap-2.5 hide-scrollbar py-1 px-4 lg:px-1 w-full">
                      {categories.map(cat => {
                         const isActive = activeCategory === cat.name;
                         const IconComp = cat.icon === 'SquaresFour' ? SquaresFour : getCategoryIcon(cat.icon) || Gear;
@@ -200,9 +217,9 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                  </div>
                  
                  {/* Slider Layout */}
-                 {/* Desktop: flex row with arrows. Mobile: just the grid, no arrows */}
+                 {/* Swipeable scroll-snap slider */}
                  <div className="w-full">
-                   <div className="flex items-center gap-3 w-full">
+                   <div className="flex items-center gap-3 w-full group/slider">
                     {/* Left Arrow - hidden on mobile */}
                     <div className="hidden md:flex shrink-0 w-11 items-center justify-center">
                       {totalPages > 1 && (
@@ -216,60 +233,69 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                       )}
                     </div>
 
-                    {/* Cards Grid */}
-                    <div className="overflow-hidden flex-1 min-w-0">
-                      <div 
-                        className="flex transition-transform duration-500 ease-in-out" 
-                        style={{ transform: `translateX(-${currentPage * 100}%)` }}
-                      >
-                        {Array.from({ length: totalPages || 1 }).map((_, pageIndex) => (
-                          <div key={pageIndex} className="w-full shrink-0">
-                            {/* Mobile: 4-col icon grid | Tablet: 2-col | Desktop: 3-col */}
-                            <div className="grid grid-cols-4 sm:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-5 w-full">
-                              {filteredPortals.length > 0 ? (
-                                filteredPortals.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage).map((portal, idx) => {
-                                  let displayTitle = portal.title.replace(' Portal', '');
-                                  return (
-                                    <a 
-                                      key={`${portal.id}-${idx}`} 
-                                      href={portal.url} 
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
-                                      className="group relative flex 
-                                        flex-col items-center text-center gap-2 p-3 rounded-2xl 
-                                        sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl 
-                                        bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-[#E85D44] hover:border-[#E85D44] hover:shadow-[0_8px_30px_rgba(232,93,68,0.4)] transition-all duration-300 w-full"
-                                    >
-                                      {/* Icon Box */}
-                                      <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'rounded-full bg-white p-1 border-2 border-white/90 shadow-sm overflow-hidden' : ''}`}>
-                                        {portal.customIcon ? (
-                                          <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
-                                        ) : (
-                                          <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black text-[#E85D44] bg-[#E85D44]/10">
-                                            MKN
-                                          </div>
-                                        )}
-                                      </div>
-                
-                                      {/* Text */}
-                                      <div className="flex flex-col relative z-10 sm:flex-grow sm:pr-4 w-full justify-center">
-                                        <h3 className="text-[11px] leading-tight sm:text-[15px] font-bold text-white sm:leading-[1.2] transition-colors line-clamp-2">
-                                          {displayTitle}
-                                        </h3>
-                                      </div>
-                                    </a>
-                                  );
-                                })
-                              ) : (
-                                <div className="col-span-full flex flex-col items-center justify-center py-12">
-                                  <p className="text-slate-600 text-sm font-medium">Tidak ada portal dalam kategori ini.</p>
-                                </div>
-                              )}
-                            </div>
+                    {/* Cards Grid - Swipeable */}
+                    <div 
+                      ref={showcaseScrollRef}
+                      className="flex-1 flex gap-2 sm:gap-4 lg:gap-5 overflow-x-auto snap-x snap-mandatory hide-scrollbar"
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                      onScroll={() => {
+                        if (showcaseScrollRef.current) {
+                          const el = showcaseScrollRef.current;
+                          const pageWidth = el.clientWidth;
+                          const newPage = Math.round(el.scrollLeft / pageWidth);
+                          if (newPage !== currentPage) {
+                            setCurrentPage(newPage);
+                          }
+                        }
+                      }}
+                    >
+                      {Array.from({ length: totalPages || 1 }).map((_, pageIndex) => (
+                        <div key={pageIndex} className="w-full shrink-0 snap-start snap-always">
+                          {/* Mobile: 4-col icon grid | Tablet: 2-col | Desktop: 3-col */}
+                          <div className="grid grid-cols-4 sm:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-5 w-full">
+                            {filteredPortals.length > 0 ? (
+                              filteredPortals.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage).map((portal, idx) => {
+                                let displayTitle = portal.title.replace(' Portal', '');
+                                return (
+                                  <a 
+                                    key={`${portal.id}-${idx}`} 
+                                    href={portal.url} 
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => supabase.rpc('increment_portal_click', { p_portal_id: portal.id })}
+                                    className="group relative flex 
+                                      flex-col items-center text-center gap-2 p-3 rounded-2xl 
+                                      sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl 
+                                      bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-[#E85D44] hover:border-[#E85D44] hover:shadow-[0_8px_30px_rgba(232,93,68,0.4)] transition-all duration-300 w-full"
+                                  >
+                                    {/* Icon Box */}
+                                    <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'rounded-full bg-white p-1 border-2 border-white/90 shadow-sm overflow-hidden' : ''}`}>
+                                      {portal.customIcon ? (
+                                        <img src={portal.customIcon} alt={displayTitle} className="w-full h-full object-contain rounded-[10px]" />
+                                      ) : (
+                                        <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black text-[#E85D44] bg-[#E85D44]/10">
+                                          MKN
+                                        </div>
+                                      )}
+                                    </div>
+              
+                                    {/* Text */}
+                                    <div className="flex flex-col relative z-10 sm:flex-grow sm:pr-4 w-full justify-center min-w-0">
+                                      <h3 className="text-[10px] leading-tight min-h-[2.4em] sm:min-h-0 sm:text-[15px] font-bold text-white sm:leading-[1.2] transition-colors line-clamp-2">
+                                        {displayTitle}
+                                      </h3>
+                                    </div>
+                                  </a>
+                                );
+                              })
+                            ) : (
+                              <div className="col-span-full flex flex-col items-center justify-center py-12">
+                                <p className="text-slate-600 text-sm font-medium">Tidak ada portal dalam kategori ini.</p>
+                              </div>
+                            )}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
 
                     {/* Right Arrow - hidden on mobile */}
@@ -292,7 +318,12 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                       {Array.from({ length: totalPages }).map((_, idx) => (
                         <button
                           key={idx}
-                          onClick={() => setCurrentPage(idx)}
+                          onClick={() => {
+                            setCurrentPage(idx);
+                            if (showcaseScrollRef.current) {
+                              showcaseScrollRef.current.scrollTo({ left: idx * showcaseScrollRef.current.clientWidth, behavior: 'smooth' });
+                            }
+                          }}
                           className={`h-2 rounded-full transition-all duration-300 ${
                             currentPage === idx 
                               ? 'w-6 bg-white shadow-sm' 
