@@ -39,6 +39,7 @@ export default function PortalsManager() {
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState(10);
+  const [draggedPortalId, setDraggedPortalId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPortals();
@@ -63,7 +64,7 @@ export default function PortalsManager() {
 
   const fetchPortals = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('portal_items').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('portal_items').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false });
     if (error) {
       toast.error('Gagal memuat portal: ' + error.message);
     } else {
@@ -313,8 +314,48 @@ export default function PortalsManager() {
         {filteredPortals.slice(0, visibleCount).map((portal) => (
           <div 
             key={portal.id} 
-            className="group relative bg-white rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-slate-100/50 transition-all duration-300 hover:-translate-y-1.5 flex flex-col cursor-pointer"
+            className={`group relative bg-white rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)] border transition-all duration-300 flex flex-col cursor-pointer ${draggedPortalId === portal.id ? 'opacity-50 border-blue-500 scale-95' : 'border-slate-100/50 hover:-translate-y-1.5'}`}
             onClick={() => setViewPortal(portal)}
+            draggable={selectedCategory === 'Semua' && searchQuery === '' && hasPermission('portals', 'update')}
+            onDragStart={(e) => {
+              if (selectedCategory !== 'Semua' || searchQuery !== '' || !hasPermission('portals', 'update')) return;
+              setDraggedPortalId(portal.id);
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              if (selectedCategory !== 'Semua' || searchQuery !== '') return;
+              e.dataTransfer.dropEffect = 'move';
+            }}
+            onDrop={async (e) => {
+              e.preventDefault();
+              if (selectedCategory !== 'Semua' || searchQuery !== '' || !hasPermission('portals', 'update')) return;
+              if (!draggedPortalId || draggedPortalId === portal.id) return;
+              
+              const draggedIdx = portals.findIndex(p => p.id === draggedPortalId);
+              const targetIdx = portals.findIndex(p => p.id === portal.id);
+              if (draggedIdx === -1 || targetIdx === -1) return;
+              
+              const newPortals = [...portals];
+              const [draggedItem] = newPortals.splice(draggedIdx, 1);
+              newPortals.splice(targetIdx, 0, draggedItem);
+              
+              setPortals(newPortals);
+              setDraggedPortalId(null);
+              
+              const loadingToast = toast.loading('Menyimpan urutan...');
+              try {
+                await Promise.all(
+                  newPortals.map((p, idx) => 
+                    supabase.from('portal_items').update({ sort_order: idx }).eq('id', p.id)
+                  )
+                );
+                toast.success('Urutan berhasil disimpan', { id: loadingToast });
+              } catch (err) {
+                toast.error('Gagal menyimpan urutan', { id: loadingToast });
+              }
+            }}
+            onDragEnd={() => setDraggedPortalId(null)}
           >
             {/* Top Image Area - Edge to Edge */}
             <div className="aspect-square w-full bg-slate-50 relative overflow-hidden flex items-center justify-center p-6">

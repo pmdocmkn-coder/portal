@@ -28,7 +28,7 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
   useEffect(() => {
     const fetchData = async () => {
       const [portalsRes, catsRes, settingsRes] = await Promise.all([
-        supabase.from('portal_items').select('*').order('created_at', { ascending: false }),
+        supabase.from('portal_items').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false }),
         supabase.from('categories').select('name, icon').eq('is_active', true).order('display_order', { ascending: true }),
         supabase.from('site_settings').select('*').eq('id', 1).single()
       ]);

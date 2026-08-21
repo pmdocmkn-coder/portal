@@ -117,7 +117,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
       const [settingsRes, slidersRes, portalsRes] = await Promise.all([
         supabase.from('site_settings').select('*').eq('id', 1).single(),
         supabase.from('hero_sliders').select('image_url').order('display_order', { ascending: true }),
-        supabase.from('portal_items').select('*').order('created_at', { ascending: false })
+        supabase.from('portal_items').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false })
       ]);
 
       if (settingsRes.data) {
@@ -342,15 +342,39 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact, onNavig
               <div className="h-[200px] w-full max-w-6xl mx-auto" />
             ) : filteredPortals.length > 0 ? (
               <div className="w-full relative flex justify-center px-4">
-                {/* Centered Grid Container */}
-                <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-5 mx-auto w-full max-w-6xl justify-items-center place-content-center">
-                  {filteredPortals.slice(0, 8).map((portal, idx) => {
-                    const themeIdx = portals.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
-                    const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
-                    return (
-                      <PortalAppItem key={`${portal.id}-${idx}`} portal={portal} theme={theme} themeIdx={themeIdx} idx={idx} />
-                    );
-                  })}
+                <div className="w-full max-w-6xl mx-auto relative group">
+                  {/* Panah Kiri */}
+                  <button 
+                    onClick={scrollLeft} 
+                    className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/30 backdrop-blur-md p-3 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:block"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+
+                  {/* Slider Container */}
+                  <div 
+                    ref={scrollContainerRef} 
+                    className="grid grid-rows-2 grid-flow-col auto-cols-[260px] md:auto-cols-[280px] gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-6 px-4 md:px-0"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    {filteredPortals.map((portal, idx) => {
+                      const themeIdx = portals.findIndex(p => p.id === portal.id) % CARD_THEMES.length;
+                      const theme = CARD_THEMES[themeIdx >= 0 ? themeIdx : 0];
+                      return (
+                        <div key={`${portal.id}-${idx}`} className="snap-start h-full w-full flex items-center justify-center">
+                          <PortalAppItem portal={portal} theme={theme} themeIdx={themeIdx} idx={idx} />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Panah Kanan */}
+                  <button 
+                    onClick={scrollRight} 
+                    className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/30 backdrop-blur-md p-3 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:block"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
                 </div>
               </div>
             ) : (
