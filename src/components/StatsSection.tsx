@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase';
 export const StatsSection: React.FC = () => {
   const [stats, setStats] = useState({ portals: 0, categories: 0, visitors: 0, bgImage: '/hero_tower_bg.jpg' });
 
+  const bgRef = React.useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const fetchStats = async () => {
       const [portalsRes, catsRes, settingsRes] = await Promise.all([
@@ -34,7 +36,30 @@ export const StatsSection: React.FC = () => {
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Mobile Parallax Effect
+    let animationFrameId: number;
+    const handleScroll = () => {
+      if (window.innerWidth >= 768) {
+        if (bgRef.current) bgRef.current.style.transform = 'translate3d(0,0,0)';
+        return;
+      }
+      
+      if (bgRef.current) {
+        // Calculate parallax based on scroll position
+        const scrolled = window.scrollY;
+        // Use translate3d for hardware acceleration
+        bgRef.current.style.transform = `translate3d(0, ${scrolled * 0.4}px, 0)`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial position
+
+    return () => { 
+      supabase.removeChannel(channel); 
+      window.removeEventListener('scroll', handleScroll);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   const formatNumber = (num: number) => {
@@ -46,9 +71,11 @@ export const StatsSection: React.FC = () => {
     <section className="relative w-full py-16 bg-[#2B3F56] overflow-hidden">
       {/* Background Image with Overlay */}
       <div 
-        className="absolute inset-0 z-0 opacity-20 bg-cover bg-center bg-scroll md:bg-fixed"
+        ref={bgRef}
+        className="absolute top-[-50%] left-0 w-full h-[200%] z-0 opacity-20 bg-cover bg-center md:bg-fixed"
         style={{
-          backgroundImage: `url('${stats.bgImage}')`
+          backgroundImage: `url('${stats.bgImage}')`,
+          willChange: 'transform'
         }}
       ></div>
       
