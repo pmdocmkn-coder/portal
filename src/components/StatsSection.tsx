@@ -51,6 +51,7 @@ export const StatsSection: React.FC = () => {
           backgroundImage: `url('${stats.bgImage}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
         }}
       ></div>
       
