@@ -73,7 +73,7 @@ const PortalAppItem = ({ portal, theme, themeIdx, idx }: { key?: string | number
       rel="noopener noreferrer"
       onClick={handleClick}
       title={displayTitle}
-      className="group/card relative flex flex-col items-center text-center gap-1.5 p-2.5 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/20 border border-white/10 hover:bg-white/30 hover:border-white/20 hover:-translate-y-1 transition-all duration-300 outline-none w-full h-full"
+      className="group/card relative flex flex-col items-center text-center gap-1.5 p-2.5 rounded-2xl sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20 hover:bg-white/25 hover:border-white/30 hover:-translate-y-1 transition-all duration-300 outline-none w-full h-full"
     >
       <div className={`w-12 h-12 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover/card:scale-105 ${!portal.customIcon ? 'bg-white shadow-sm p-1 border-2 border-white/90 overflow-hidden rounded-full' : ''}`}>
          {portal.customIcon ? (
