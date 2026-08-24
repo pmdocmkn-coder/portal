@@ -36,22 +36,17 @@ export const StatsSection: React.FC = () => {
       )
       .subscribe();
 
-    // Mobile Parallax Effect
+    // Parallax Effect (Unified for Desktop and Mobile)
     let animationFrameId: number;
     const handleScroll = () => {
-      if (window.innerWidth >= 768) return;
-      
       if (bgRef.current && bgRef.current.parentElement) {
         const rect = bgRef.current.parentElement.getBoundingClientRect();
         
-        // Calculate how far the section has scrolled through the viewport
-        // 0 = just entered from bottom, 1 = just leaving from top
         const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
         const clampedProgress = Math.max(0, Math.min(1, progress));
         
-        // The image is 150% height, meaning we have 50% extra space to move it up.
-        // We move it from 0px down to -(50% of section height) as we scroll.
-        const maxTranslate = rect.height * 0.5;
+        // Image is 250% height, meaning 150% extra space
+        const maxTranslate = rect.height * 1.5;
         const offset = -(clampedProgress * maxTranslate);
         
         bgRef.current.style.transform = `translate3d(0, ${offset}px, 0)`;
@@ -75,21 +70,15 @@ export const StatsSection: React.FC = () => {
 
   return (
     <section className="relative w-full py-16 bg-[#2B3F56] overflow-hidden">
-      {/* MOBILE Parallax Layer: Uses JS translate3d to avoid iOS jumping bug */}
+      {/* Unified Parallax Layer (Desktop & Mobile) 
+          Uses JS translate3d to guarantee the image stays centered in the section 
+          and doesn't get cut off by viewport bounds like bg-fixed does. */}
       <div 
         ref={bgRef}
-        className="absolute top-0 left-0 w-full h-[150%] z-0 opacity-20 bg-cover bg-center md:hidden"
+        className="absolute top-0 left-0 w-full h-[250%] z-0 opacity-20 bg-cover bg-bottom"
         style={{
           backgroundImage: `url('${stats.bgImage}')`,
           willChange: 'transform'
-        }}
-      ></div>
-
-      {/* DESKTOP Parallax Layer: Uses native CSS background-fixed (smooth on PC) */}
-      <div 
-        className="hidden md:block absolute inset-0 z-0 opacity-20 bg-cover bg-center bg-fixed"
-        style={{
-          backgroundImage: `url('${stats.bgImage}')`
         }}
       ></div>
       
