@@ -39,16 +39,22 @@ export const StatsSection: React.FC = () => {
     // Mobile Parallax Effect
     let animationFrameId: number;
     const handleScroll = () => {
-      if (window.innerWidth >= 768) {
-        if (bgRef.current) bgRef.current.style.transform = 'translate3d(0,0,0)';
-        return;
-      }
+      if (window.innerWidth >= 768) return;
       
-      if (bgRef.current) {
-        // Calculate parallax based on scroll position
-        const scrolled = window.scrollY;
-        // Use translate3d for hardware acceleration
-        bgRef.current.style.transform = `translate3d(0, ${scrolled * 0.4}px, 0)`;
+      if (bgRef.current && bgRef.current.parentElement) {
+        const rect = bgRef.current.parentElement.getBoundingClientRect();
+        
+        // Calculate how far the section has scrolled through the viewport
+        // 0 = just entered from bottom, 1 = just leaving from top
+        const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
+        const clampedProgress = Math.max(0, Math.min(1, progress));
+        
+        // The image is 150% height, meaning we have 50% extra space to move it up.
+        // We move it from 0px down to -(50% of section height) as we scroll.
+        const maxTranslate = rect.height * 0.5;
+        const offset = -(clampedProgress * maxTranslate);
+        
+        bgRef.current.style.transform = `translate3d(0, ${offset}px, 0)`;
       }
     };
 
@@ -72,7 +78,7 @@ export const StatsSection: React.FC = () => {
       {/* MOBILE Parallax Layer: Uses JS translate3d to avoid iOS jumping bug */}
       <div 
         ref={bgRef}
-        className="absolute top-[-50%] left-0 w-full h-[200%] z-0 opacity-20 bg-cover bg-center md:hidden"
+        className="absolute top-0 left-0 w-full h-[150%] z-0 opacity-20 bg-cover bg-center md:hidden"
         style={{
           backgroundImage: `url('${stats.bgImage}')`,
           willChange: 'transform'
