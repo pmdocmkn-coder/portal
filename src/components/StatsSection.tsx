@@ -46,12 +46,9 @@ export const StatsSection: React.FC = () => {
     <section className="relative w-full py-16 bg-[#2B3F56] overflow-hidden">
       {/* Background Image with Overlay */}
       <div 
-        className="absolute inset-0 z-0 opacity-20"
+        className="absolute inset-0 z-0 opacity-20 bg-cover bg-center bg-scroll md:bg-fixed"
         style={{
-          backgroundImage: `url('${stats.bgImage}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
+          backgroundImage: `url('${stats.bgImage}')`
         }}
       ></div>
       
