@@ -226,7 +226,7 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                         <button 
                           onClick={prevPage}
                           disabled={currentPage === 0}
-                          className="w-11 h-11 bg-white/20 hover:bg-white/30 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center rounded-full backdrop-blur-md transition-all"
+                          className="w-11 h-11 bg-white/30 hover:bg-white/40 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center rounded-full transition-all"
                         >
                           <CaretLeft className="w-5 h-5 text-white" weight="bold" />
                         </button>
@@ -266,7 +266,7 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                                     className="group relative flex 
                                       flex-col items-center text-center gap-2 p-3 rounded-2xl 
                                       sm:flex-row sm:items-center sm:text-left sm:gap-4 sm:p-4 sm:rounded-2xl 
-                                      bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-[#E85D44] hover:border-[#E85D44] hover:shadow-[0_8px_30px_rgba(232,93,68,0.4)] transition-all duration-300 w-full"
+                                      bg-white/15 border border-white/20 hover:bg-[#E85D44] hover:border-[#E85D44] hover:shadow-[0_8px_30px_rgba(232,93,68,0.4)] transition-all duration-300 w-full"
                                   >
                                     {/* Icon Box */}
                                     <div className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105 ${!portal.customIcon ? 'rounded-full bg-white p-1 border-2 border-white/90 shadow-sm overflow-hidden' : ''}`}>
@@ -304,7 +304,7 @@ export const PortalsShowcaseSection: React.FC<{ onClose?: () => void, isClosing?
                         <button 
                           onClick={nextPage}
                           disabled={currentPage === totalPages - 1}
-                          className="w-11 h-11 bg-white/20 hover:bg-white/30 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center rounded-full backdrop-blur-md transition-all"
+                          className="w-11 h-11 bg-white/30 hover:bg-white/40 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center rounded-full transition-all"
                         >
                           <CaretRight className="w-5 h-5 text-white" weight="bold" />
                         </button>
