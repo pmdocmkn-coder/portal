@@ -69,13 +69,21 @@ export const StatsSection: React.FC = () => {
 
   return (
     <section className="relative w-full py-16 bg-[#2B3F56] overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* MOBILE Parallax Layer: Uses JS translate3d to avoid iOS jumping bug */}
       <div 
         ref={bgRef}
-        className="absolute top-[-50%] left-0 w-full h-[200%] z-0 opacity-20 bg-cover bg-center md:bg-fixed"
+        className="absolute top-[-50%] left-0 w-full h-[200%] z-0 opacity-20 bg-cover bg-center md:hidden"
         style={{
           backgroundImage: `url('${stats.bgImage}')`,
           willChange: 'transform'
+        }}
+      ></div>
+
+      {/* DESKTOP Parallax Layer: Uses native CSS background-fixed (smooth on PC) */}
+      <div 
+        className="hidden md:block absolute inset-0 z-0 opacity-20 bg-cover bg-center bg-fixed"
+        style={{
+          backgroundImage: `url('${stats.bgImage}')`
         }}
       ></div>
       
